@@ -1,0 +1,191 @@
+{
+  "nav": {
+    "home": "Início",
+    "services": "Serviços",
+    "pricing": "Preços",
+    "contact": "Contato"
+  },
+  "hero": {
+    "title": "Realize seu Sonho de Viver na Espanha",
+    "subtitle": "Consultoria especializada para nômades digitais. Visto, impostos, planejamento e mentoria completa para sua mudança.",
+    "cta": "Agendar Consulta Gratuita",
+    "secondary_cta": "Conhecer Serviços"
+  },
+  "benefits": {
+    "title": "Por que Escolher a NomadWay?",
+    "subtitle": "Experiência comprovada ajudando profissionais remotos a se estabelecerem na Espanha",
+    "items": {
+      "expertise": {
+        "title": "Expertise Comprovada",
+        "description": "Anos de experiência ajudando nômades digitais com visto, Lei Beckham e regularização fiscal"
+      },
+      "support": {
+        "title": "Suporte Personalizado",
+        "description": "Acompanhamento individual em cada etapa da sua jornada para a Espanha"
+      },
+      "network": {
+        "title": "Rede de Contatos",
+        "description": "Conexões com advogados, contadores e comunidade de nômades digitais na Espanha"
+      },
+      "success": {
+        "title": "Taxa de Sucesso",
+        "description": "98% de aprovação nos vistos e processos que acompanhamos"
+      }
+    }
+  },
+  "services": {
+    "title": "Nossos Serviços",
+    "subtitle": "Soluções completas para sua mudança",
+    "consulting": {
+      "title": "Consultoria de Visto",
+      "description": "Orientação completa sobre visto de nômade digital, requisitos, documentação e timeline",
+      "features": [
+        "Análise de elegibilidade",
+        "Checklist de documentos",
+        "Simulação de timeline",
+        "Suporte na aplicação"
+      ]
+    },
+    "mentorship": {
+      "title": "Mentoria Fiscal",
+      "description": "Planejamento tributário, Lei Beckham, segurança social e otimização fiscal",
+      "features": [
+        "Análise Lei Beckham",
+        "Planejamento tributário",
+        "Conexão com contadores",
+        "Otimização fiscal"
+      ]
+    },
+    "planning": {
+      "title": "Planejamento Completo",
+      "description": "Da decisão ao desembarque: moradia, custos, cultura e integração",
+      "features": [
+        "Escolha de cidade",
+        "Orçamento detalhado",
+        "Guia de integração",
+        "Networking local"
+      ]
+    }
+  },
+  "testimonials": {
+    "title": "O que Dizem Nossos Clientes",
+    "items": [
+      {
+        "name": "Ana Silva",
+        "role": "Desenvolvedora Full-Stack",
+        "text": "A NomadWay foi essencial na minha mudança para Barcelona. Consegui meu visto de nômade digital em 3 meses!",
+        "location": "Barcelona, ES"
+      },
+      {
+        "name": "Carlos Mendes",
+        "role": "Designer UX/UI",
+        "text": "O suporte com a Lei Beckham me economizou milhares de euros. Profissionais super atualizados!",
+        "location": "Madri, ES"
+      },
+      {
+        "name": "Mariana Costa",
+        "role": "Product Manager",
+        "text": "Desde a escolha da cidade até a abertura de conta bancária, tive apoio em tudo. Recomendo!",
+        "location": "Valencia, ES"
+      }
+    ]
+  },
+  "cta": {
+    "title": "Pronto para Começar sua Jornada?",
+    "subtitle": "Agende uma consulta gratuita de 30 minutos e descubra como podemos ajudar você",
+    "button": "Agendar Consulta Gratuita"
+  },
+  "pricing": {
+    "title": "Planos e Investimento",
+    "subtitle": "Escolha o plano ideal para o seu momento",
+    "basic": {
+      "name": "Consultoria Inicial",
+      "price": "€297",
+      "description": "Ideal para quem está começando a pesquisar",
+      "features": [
+        "1 sessão de 90 minutos",
+        "Análise de elegibilidade",
+        "Roadmap personalizado",
+        "Checklist de documentos",
+        "Suporte por email (7 dias)"
+      ],
+      "cta": "Começar Agora"
+    },
+    "pro": {
+      "name": "Mentoria Completa",
+      "price": "€997",
+      "description": "Acompanhamento completo do processo",
+      "popular": true,
+      "features": [
+        "4 sessões de mentoria",
+        "Suporte visto + fiscal",
+        "Revisão de documentos",
+        "Conexão com especialistas",
+        "Suporte WhatsApp (30 dias)",
+        "Grupo exclusivo de networking"
+      ],
+      "cta": "Plano Mais Popular"
+    },
+    "vip": {
+      "name": "VIP Total",
+      "price": "€2.497",
+      "description": "Concierge completo para sua mudança",
+      "features": [
+        "Sessões ilimitadas (3 meses)",
+        "Gestão completa do processo",
+        "Busca de moradia",
+        "Abertura de contas",
+        "Suporte 24/7",
+        "Acompanhamento presencial",
+        "Integração cultural"
+      ],
+      "cta": "Experiência VIP"
+    }
+  },
+  "contact": {
+    "title": "Entre em Contato",
+    "subtitle": "Estamos aqui para ajudar você a realizar seu sonho de viver na Espanha",
+    "form": {
+      "name": "Nome Completo",
+      "email": "Email",
+      "phone": "Telefone (WhatsApp)",
+      "service": "Serviço de Interesse",
+      "message": "Conte-nos sobre sua situação",
+      "submit": "Enviar Mensagem",
+      "success": "Mensagem enviada com sucesso! Entraremos em contato em até 24h.",
+      "error": "Erro ao enviar mensagem. Por favor, tente novamente."
+    },
+    "info": {
+      "email": "contato@nomadway.com",
+      "whatsapp": "+351 912 345 678",
+      "hours": "Seg-Sex: 9h-18h (Horário PT)"
+    }
+  },
+  "footer": {
+    "tagline": "Sua ponte para a vida nômade na Espanha",
+    "disclaimer": "A NomadWay oferece consultoria e mentoria informativa. Não prestamos serviços jurídicos ou contábeis. Para questões legais e fiscais, conectamos você com profissionais certificados.",
+    "rights": "© 2024 NomadWay. Todos os direitos reservados.",
+    "links": {
+      "privacy": "Política de Privacidade",
+      "terms": "Termos de Uso"
+    }
+  },
+  "meta": {
+    "home": {
+      "title": "NomadWay - Consultoria para Nômades Digitais na Espanha",
+      "description": "Consultoria especializada em visto de nômade digital, Lei Beckham e planejamento completo para viver e trabalhar na Espanha. Mentoria personalizada."
+    },
+    "services": {
+      "title": "Serviços - Consultoria Visto, Fiscal e Planejamento | NomadWay",
+      "description": "Consultoria de visto de nômade digital, mentoria fiscal com Lei Beckham e planejamento completo de mudança para Espanha. Suporte especializado."
+    },
+    "pricing": {
+      "title": "Planos e Preços - Investimento em sua Mudança | NomadWay",
+      "description": "Confira nossos planos de consultoria e mentoria para nômades digitais. Do básico ao VIP, encontre o investimento ideal para sua jornada na Espanha."
+    },
+    "contact": {
+      "title": "Contato - Agende sua Consulta Gratuita | NomadWay",
+      "description": "Entre em contato conosco e agende uma consulta gratuita. Tire suas dúvidas sobre visto, impostos e mudança para a Espanha."
+    }
+  }
+}

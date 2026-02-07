@@ -1,0 +1,191 @@
+{
+  "nav": {
+    "home": "Home",
+    "services": "Services",
+    "pricing": "Pricing",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "Make Your Dream of Living in Spain Come True",
+    "subtitle": "Specialized consulting for digital nomads. Visa, taxes, planning and complete mentorship for your move.",
+    "cta": "Schedule Free Consultation",
+    "secondary_cta": "Explore Services"
+  },
+  "benefits": {
+    "title": "Why Choose NomadWay?",
+    "subtitle": "Proven experience helping remote professionals settle in Spain",
+    "items": {
+      "expertise": {
+        "title": "Proven Expertise",
+        "description": "Years of experience helping digital nomads with visas, Beckham Law and tax compliance"
+      },
+      "support": {
+        "title": "Personalized Support",
+        "description": "Individual guidance at every step of your journey to Spain"
+      },
+      "network": {
+        "title": "Network of Contacts",
+        "description": "Connections with lawyers, accountants and digital nomad community in Spain"
+      },
+      "success": {
+        "title": "Success Rate",
+        "description": "98% approval rate on visas and processes we support"
+      }
+    }
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Complete solutions for your move",
+    "consulting": {
+      "title": "Visa Consulting",
+      "description": "Complete guidance on digital nomad visa, requirements, documentation and timeline",
+      "features": [
+        "Eligibility analysis",
+        "Document checklist",
+        "Timeline simulation",
+        "Application support"
+      ]
+    },
+    "mentorship": {
+      "title": "Tax Mentorship",
+      "description": "Tax planning, Beckham Law, social security and tax optimization",
+      "features": [
+        "Beckham Law analysis",
+        "Tax planning",
+        "Accountant connections",
+        "Tax optimization"
+      ]
+    },
+    "planning": {
+      "title": "Complete Planning",
+      "description": "From decision to landing: housing, costs, culture and integration",
+      "features": [
+        "City selection",
+        "Detailed budget",
+        "Integration guide",
+        "Local networking"
+      ]
+    }
+  },
+  "testimonials": {
+    "title": "What Our Clients Say",
+    "items": [
+      {
+        "name": "Ana Silva",
+        "role": "Full-Stack Developer",
+        "text": "NomadWay was essential in my move to Barcelona. I got my digital nomad visa in 3 months!",
+        "location": "Barcelona, ES"
+      },
+      {
+        "name": "Carlos Mendes",
+        "role": "UX/UI Designer",
+        "text": "The support with Beckham Law saved me thousands of euros. Super updated professionals!",
+        "location": "Madrid, ES"
+      },
+      {
+        "name": "Mariana Costa",
+        "role": "Product Manager",
+        "text": "From choosing the city to opening a bank account, I had support in everything. Highly recommend!",
+        "location": "Valencia, ES"
+      }
+    ]
+  },
+  "cta": {
+    "title": "Ready to Start Your Journey?",
+    "subtitle": "Schedule a free 30-minute consultation and discover how we can help you",
+    "button": "Schedule Free Consultation"
+  },
+  "pricing": {
+    "title": "Plans & Investment",
+    "subtitle": "Choose the ideal plan for your moment",
+    "basic": {
+      "name": "Initial Consulting",
+      "price": "€297",
+      "description": "Ideal for those starting to research",
+      "features": [
+        "1 session of 90 minutes",
+        "Eligibility analysis",
+        "Personalized roadmap",
+        "Document checklist",
+        "Email support (7 days)"
+      ],
+      "cta": "Get Started"
+    },
+    "pro": {
+      "name": "Complete Mentorship",
+      "price": "€997",
+      "description": "Full process support",
+      "popular": true,
+      "features": [
+        "4 mentorship sessions",
+        "Visa + tax support",
+        "Document review",
+        "Specialist connections",
+        "WhatsApp support (30 days)",
+        "Exclusive networking group"
+      ],
+      "cta": "Most Popular Plan"
+    },
+    "vip": {
+      "name": "Total VIP",
+      "price": "€2,497",
+      "description": "Complete concierge for your move",
+      "features": [
+        "Unlimited sessions (3 months)",
+        "Complete process management",
+        "Housing search",
+        "Account opening",
+        "24/7 support",
+        "In-person support",
+        "Cultural integration"
+      ],
+      "cta": "VIP Experience"
+    }
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "subtitle": "We're here to help you achieve your dream of living in Spain",
+    "form": {
+      "name": "Full Name",
+      "email": "Email",
+      "phone": "Phone (WhatsApp)",
+      "service": "Service of Interest",
+      "message": "Tell us about your situation",
+      "submit": "Send Message",
+      "success": "Message sent successfully! We'll contact you within 24h.",
+      "error": "Error sending message. Please try again."
+    },
+    "info": {
+      "email": "contact@nomadway.com",
+      "whatsapp": "+351 912 345 678",
+      "hours": "Mon-Fri: 9am-6pm (PT Time)"
+    }
+  },
+  "footer": {
+    "tagline": "Your bridge to nomadic life in Spain",
+    "disclaimer": "NomadWay offers informational consulting and mentorship. We do not provide legal or accounting services. For legal and tax matters, we connect you with certified professionals.",
+    "rights": "© 2024 NomadWay. All rights reserved.",
+    "links": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Use"
+    }
+  },
+  "meta": {
+    "home": {
+      "title": "NomadWay - Consulting for Digital Nomads in Spain",
+      "description": "Specialized consulting in digital nomad visa, Beckham Law and complete planning to live and work in Spain. Personalized mentorship."
+    },
+    "services": {
+      "title": "Services - Visa, Tax & Planning Consulting | NomadWay",
+      "description": "Digital nomad visa consulting, tax mentorship with Beckham Law and complete moving planning to Spain. Specialized support."
+    },
+    "pricing": {
+      "title": "Plans & Pricing - Investment in Your Move | NomadWay",
+      "description": "Check our consulting and mentorship plans for digital nomads. From basic to VIP, find the ideal investment for your journey in Spain."
+    },
+    "contact": {
+      "title": "Contact - Schedule Your Free Consultation | NomadWay",
+      "description": "Contact us and schedule a free consultation. Get answers about visa, taxes and moving to Spain."
+    }
+  }
+}
