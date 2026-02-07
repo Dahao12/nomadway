@@ -1,6 +1,3 @@
-# Vercel Configuration
-# Docs: https://vercel.com/docs/project-configuration
-
 {
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
