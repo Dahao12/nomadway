@@ -15,7 +15,7 @@ export default function Footer({ dict, locale }: FooterProps) {
           {/* Brand */}
           <div className="space-y-4">
             <Image
-              src="/nomadway/logo.png"
+              src="/logo.png"
               alt="NomadWay"
               width={140}
               height={40}

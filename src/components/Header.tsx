@@ -24,7 +24,7 @@ export default function Header({ dict, locale }: HeaderProps) {
           {/* Logo */}
           <Link href={`/${locale}`} className="flex items-center gap-2 group">
             <Image
-              src="/nomadway/logo.png"
+              src="/logo.png"
               alt="NomadWay Logo"
               width={140}
               height={40}
