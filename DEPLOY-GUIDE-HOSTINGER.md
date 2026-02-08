@@ -1,7 +1,138 @@
-# Deploy NomadWay para Hostinger
-**Domínio:** nomadway.com.br
-**Hosting:** Hostinger (Node.js compatível)
-**Build gerado:** ✅ (14 páginas)
+# Deploy NomadWay para Hostinger - MANUAL
+**Status:** ✅ PARCIAL (arquivos principais enviados)
+**Próximo passo:** Upload manual via File Manager
+
+---
+
+## 🎯 STATUS ATUAL
+
+**Site respondendo:** ✅ https://nomadway.com.br/ (HTTP 200)
+**Arquivos enviados:**
+- ✅ index.html
+- ✅ logo.png
+- ✅ robots.txt
+- ✅ sitemap.xml
+- ⏳ _next/ (em processamento via FTP)
+- ⏳ pt/ (páginas em português)
+- ⏳ en/ (páginas em inglês)
+
+---
+
+## ⚠️ PROBLEMA FTP COMANDO-LINHA
+
+FTP via curl (comando-linha) tem limitações:
+- ❌ Não cria diretórios automaticamente
+- ❌ Upload recursivo complexo
+- ❌ Erros com paths longos
+
+---
+
+## 🛠️ SOLUÇÃO: UPLOAD MANUAL
+
+### **Opção 1: File Manager Hostinger (RECOMENDADO)**
+
+1. **Acesse hPanel:** https://hpanel.hostinger.com
+2. **Login** com suas credenciais
+3. **Hosting** → **Manage** (nomadway.com.br)
+4. **File Manager** → **Go to File Manager**
+5. **Navegue:** domains/nomadway.com.br/public_html/
+6. **DELETE todos arquivos antigos:**
+   - components, scripts, prisma, .yarn, etc
+   - Manter: index.html, logo.png (se quiser)
+7. **Upload:**
+   - Click em **Upload**
+   - Selecione **/Users/clowd/.openclaw/workspace/nomadway/out/**
+   - Upload **TODOS** arquivos e pastas
+
+**Segundos estimados:** 2-3 min (drag & drop)
+
+---
+
+### **Opção 2: FileZilla (FTP Client)**
+
+1. **Baixar FileZilla:** https://filezilla-project.org
+2. **Conectar:**
+   - Host: 185.245.180.59
+   - User: u608840078
+   - Pass: 5676484aS@@
+   - Porta: 21
+3. **Navegar:** domains/nomadway.com.br/public_html/
+4. **Delete** tudo antigo
+5. **Upload** pasta out/** (drag & drop)
+
+**Segundos estimados:** 2-5 min
+
+---
+
+### **Opção 3: Browser (Chrome) - Direto**
+
+1. **Chrome:** ftp://185.245.180.59
+2. **User:** u608840078
+3. **Pass:** 5676484aS@@
+4. **Navegar:** domains/nomadway.com.br/public_html/
+5. **Arrastar arquivos** do Finder
+
+**Segundos estimados:** 3-5 min
+
+---
+
+## 📂 ARQUIVOS PARA UPLOAD
+
+```
+/Users/clowd/.openclaw/workspace/nomadway/out/
+├── index.html          ✅
+├── logo.png            ✅
+├── robots.txt          ✅
+├── sitemap.xml         ✅
+├── _next/              ⏳ (fazer upload)
+│   ├── static/
+│   │   ├── css/
+│   │   ├── chunks/
+│   │   └── media/
+│   └── ...
+├── pt/                 ⏳ (fazer upload)
+│   ├── index.html
+│   ├── contact/
+│   ├── services/
+│   └── pricing/
+├── en/                 ⏳ (fazer upload)
+│   ├── index.html
+│   ├── contact/
+│   ├── services/
+│   └── pricing/
+└── favicon.svg
+```
+
+---
+
+## ✅ DEPOIS DO UPLOAD
+
+1. **Acesse:** https://nomadway.com.br
+2. **Verifique:**
+   - Homepage carrega
+   - Redirecionamento para /pt ou /en
+   - Logo aparece
+   - Links funcionam
+   - Formulário envia para contato@nomadway.com.br
+
+3. **Teste formulário:** /pt/contact
+   - Preencha um teste
+   - Envie
+   - Verifique email em contato@nomadway.com.br
+
+---
+
+## 🎯 RECOMENDAÇÃO
+
+**File Manager (hPanel)** - Mais simples, arrastar-e-soltar
+
+**FileZilla** - Mais controle, resume de uploads
+
+**Browser FTP** - Mais direto, sem instalar nada
+
+---
+
+**Upload manual é mais rápido e confiável!** 🚀
 
 ---
 
