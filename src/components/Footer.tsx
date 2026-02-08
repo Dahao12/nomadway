@@ -34,7 +34,7 @@ export default function Footer({ dict, locale }: FooterProps) {
                 <FaLinkedin size={20} />
               </a>
               <a
-                href="https://instagram.com"
+                href="https://instagram.com/nomadwaydigital"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
