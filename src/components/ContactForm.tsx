@@ -29,7 +29,7 @@ export default function ContactForm({ dict, locale }: ContactFormProps) {
     formData.append('_subject', `Contato NomadWay - ${formData.get('name')}`)
 
     try {
-      const response = await fetch('https://formsubmit.co/ajax/contato@nomadway.com', {
+      const response = await fetch('https://formsubmit.co/ajax/contato@nomadway.com.br', {
         method: 'POST',
         body: formData,
       })
