@@ -22,12 +22,28 @@ export default function ContactForm({ dict, locale }: ContactFormProps) {
     e.preventDefault()
     setStatus('loading')
 
-    // Simulate API call
-    setTimeout(() => {
-      setStatus('success')
-      setFormData({ name: '', email: '', phone: '', service: '', message: '' })
-      setTimeout(() => setStatus('idle'), 5000)
-    }, 1500)
+    const formElement = e.target as HTMLFormElement
+    const formData = new FormData(formElement)
+
+    // Add FormSubmit configuration
+    formData.append('_subject', `Contato NomadWay - ${formData.get('name')}`)
+
+    try {
+      const response = await fetch('https://formsubmit.co/ajax/contato@nomadway.com', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (response.ok) {
+        setStatus('success')
+        setFormData({ name: '', email: '', phone: '', service: '', message: '' })
+        setTimeout(() => setStatus('idle'), 5000)
+      } else {
+        setStatus('error')
+      }
+    } catch (error) {
+      setStatus('error')
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -45,7 +61,11 @@ export default function ContactForm({ dict, locale }: ContactFormProps) {
           {locale === 'pt' ? 'Envie sua Mensagem' : 'Send Your Message'}
         </h2>
         
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6" method="POST">
+          {/* Honeypot for spam protection */}
+          <input type="text" name="_honey" style={{ display: 'none' }} />
+          {/* Disable captcha */}
+          <input type="hidden" name="_captcha" value="false" />
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
               {dict.contact.form.name} *
