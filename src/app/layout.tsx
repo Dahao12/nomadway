@@ -42,7 +42,10 @@ export default function RootLayout({
 }) {
   return (
     <html>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        {children}
+        <script src="/cookie-consent.js" async />
+      </body>
     </html>
   )
 }
