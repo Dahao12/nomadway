@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { getDictionary } from '@/lib/getDictionary'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import TypebotEmbed from '@/components/TypebotEmbed'
 import { locales } from '@/config/i18n'
 
 export async function generateStaticParams() {
@@ -44,6 +45,7 @@ export default async function LangLayout({
         {children}
       </main>
       <Footer dict={dict} locale={params.lang} />
+      <TypebotEmbed />
     </>
   )
 }
