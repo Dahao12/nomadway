@@ -100,28 +100,28 @@
     "subtitle": "Choose the ideal plan for your moment",
     "basic": {
       "name": "Initial Consulting",
-      "price": "€297",
+      "price": "GRATUITA",
       "description": "Ideal for those starting to research",
       "features": [
-        "1 session of 90 minutes",
+        "1 session of 30 minutes",
         "Eligibility analysis",
         "Personalized roadmap",
         "Document checklist",
-        "Email support (7 days)"
+        "Initial action plan"
       ],
       "cta": "Get Started"
     },
     "pro": {
       "name": "Complete Mentorship",
-      "price": "€997",
+      "price": "€999.90",
       "description": "Full process support",
       "popular": true,
       "features": [
         "4 mentorship sessions",
-        "Visa + tax support",
+        "Visa support",
         "Document review",
         "Specialist connections",
-        "WhatsApp support (30 days)",
+        "WhatsApp support",
         "Exclusive networking group"
       ],
       "cta": "Most Popular Plan"
@@ -169,6 +169,136 @@
       "privacy": "Privacy Policy",
       "terms": "Terms of Use"
     }
+  },
+  "terms": {
+    "title": "Terms of Use",
+    "lastUpdated": "Last updated: 08/02/2026",
+    "sections": [
+      {
+        "title": "1. Acceptance of Terms",
+        "content": [
+          "By accessing and using NomadWay services, you agree to these terms of use. If you disagree with any part of these terms, you must not use our services."
+        ]
+      },
+      {
+        "title": "2. Nature of Services",
+        "content": [
+          "NomadWay provides informational consulting and mentorship about digital nomad visa, Beckham Law and relocation planning to Spain.",
+          "We do NOT provide legal or accounting services. For legal and tax matters, we connect you with certified professionals.",
+          "Our consulting is based on previous experience and information available at the time of service. Results may vary."
+        ]
+      },
+      {
+        "title": "3. Intellectual Property",
+        "content": [
+          "All content on this site, including text, images, logos and other materials, is the property of NomadWay and is protected by copyright laws.",
+          "You may not copy, modify, distribute or use any content without prior written authorization."
+        ]
+      },
+      {
+        "title": "4. Site Usage",
+        "content": [
+          "You agree to use this site only for informational and legal purposes.",
+          "It is prohibited: attempting to gain unauthorized access to the site; interfering with site operation; using the site for any illegal purpose."
+        ]
+      },
+      {
+        "title": "5. Limitation of Liability",
+        "content": [
+          "NomadWay is not liable for direct, indirect, incidental or consequential damages resulting from the use or inability to use our services.",
+          "We do not guarantee that use of this site will be uninterrupted or error-free."
+        ]
+      },
+      {
+        "title": "6. Refund Policy",
+        "content": [
+          "Free consultation: not eligible for refund.",
+          "Paid plans (Complete Mentorship, VIP): refund available up to 7 days after first session, if you are not satisfied with services provided.",
+          "After first session and after 7 days, we do not offer refunds."
+        ]
+      },
+      {
+        "title": "7. Changes to Terms",
+        "content": [
+          "NomadWay reserves the right to update these terms at any time.",
+          "By continuing to use our services after changes, you agree to the new terms."
+        ]
+      },
+      {
+        "title": "8. Contact",
+        "content": [
+          "For questions about these terms, contact us: contact@nomadway.com.br"
+        ]
+      }
+    ]
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: 08/02/2026",
+    "sections": [
+      {
+        "title": "1. Information Collection",
+        "content": [
+          "We collect information you provide: name, email, phone, professional and immigration situation information.",
+          "We automatically collect site access information: IP address, browser, visit duration, pages accessed."
+        ]
+      },
+      {
+        "title": "2. Use of Information",
+        "content": [
+          "We use your information to: provide consulting and mentorship; answer your questions; improve our services; send relevant communications.",
+          "We do not share your information with third parties except when necessary to provide requested services (ex: connection with lawyers or accountants)."
+        ]
+      },
+      {
+        "title": "3. Data Security",
+        "content": [
+          "We implement security measures to protect your information against unauthorized access, alteration or destruction.",
+          "However, no transmission method over the internet is 100% secure and we cannot guarantee absolute security."
+        ]
+      },
+      {
+        "title": "4. Cookies",
+        "content": [
+          "We use cookies to improve user experience, remember preferences and understand usage metrics.",
+          "You can configure your browser to refuse cookies, but this may affect site functionality."
+        ]
+      },
+      {
+        "title": "5. Your Rights",
+        "content": [
+          "You have the right to: access your information; request correction of inaccurate data; request deletion of your data; withdraw consent for data processing.",
+          "To exercise these rights, contact: contact@nomadway.com.br"
+        ]
+      },
+      {
+        "title": "6. Marketing Communications",
+        "content": [
+          "With your consent, we may send marketing emails about our services. You can unsubscribe at any time by clicking 'Unsubscribe' in the email.",
+          "We do not share your information for marketing purposes with third parties."
+        ]
+      },
+      {
+        "title": "7. Retention Policy",
+        "content": [
+          "We retain your information while necessary to provide our services and comply with legal obligations.",
+          "After relationship ends, we keep data only for necessary period (usually 3 years)."
+        ]
+      },
+      {
+        "title": "8. Applicable Law",
+        "content": [
+          "This privacy policy is governed by Spanish laws (GDPR) and Brazilian laws (LGPD).",
+          "Any dispute will be resolved in competent courts."
+        ]
+      },
+      {
+        "title": "9. Contact",
+        "content": [
+          "For privacy questions or to exercise your rights: contact@nomadway.com.br"
+        ]
+      }
+    ]
   },
   "meta": {
     "home": {

@@ -1,0 +1,8 @@
+open 185.245.180.59
+u608840078
+5676484aS@
+cd public_html
+lcd /Users/clowd/.openclaw/workspace/nomadway/out
+binary
+!find . -type f -exec ftp -in {} \;
+by

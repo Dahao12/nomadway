@@ -100,28 +100,28 @@
     "subtitle": "Escolha o plano ideal para o seu momento",
     "basic": {
       "name": "Consultoria Inicial",
-      "price": "€297",
+      "price": "GRATUITA",
       "description": "Ideal para quem está começando a pesquisar",
       "features": [
-        "1 sessão de 90 minutos",
+        "1 sessão de 30 minutos",
         "Análise de elegibilidade",
         "Roadmap personalizado",
         "Checklist de documentos",
-        "Suporte por email (7 dias)"
+        "Plano de ação inicial"
       ],
       "cta": "Começar Agora"
     },
     "pro": {
       "name": "Mentoria Completa",
-      "price": "€997",
+      "price": "€999.90",
       "description": "Acompanhamento completo do processo",
       "popular": true,
       "features": [
         "4 sessões de mentoria",
-        "Suporte visto + fiscal",
+        "Suporte visto",
         "Revisão de documentos",
         "Conexão com especialistas",
-        "Suporte WhatsApp (30 dias)",
+        "Suporte WhatsApp",
         "Grupo exclusivo de networking"
       ],
       "cta": "Plano Mais Popular"
@@ -169,6 +169,136 @@
       "privacy": "Política de Privacidade",
       "terms": "Termos de Uso"
     }
+  },
+  "terms": {
+    "title": "Termos de Uso",
+    "lastUpdated": "Última atualização: 08/02/2026",
+    "sections": [
+      {
+        "title": "1. Aceitação dos Termos",
+        "content": [
+          "Ao acessar e usar os serviços da NomadWay, você concorda com estes termos de uso. Se você discordar de qualquer parte destes termos, não deve usar nossos serviços."
+        ]
+      },
+      {
+        "title": "2. Natureza dos Serviços",
+        "content": [
+          "A NomadWay oferece consultoria e mentoria informativa sobre visto de nômade digital, Lei Beckham e planejamento de relocação para Espanha.",
+          "NÃO realizamos serviços jurídicos ou contábeis. Para questões legais e fiscais, conectamos você com profissionais certificados.",
+          "Nossa consultoria é baseada em experiência anterior e informações disponíveis no momento do atendimento. Resultados podem variar."
+        ]
+      },
+      {
+        "title": "3. Propriedade Intelectual",
+        "content": [
+          "Todo o conteúdo deste site, incluindo textos, imagens, logos e outros materiais, são propriedade da NomadWay e protegidos por direitos autorais.",
+          "Você não pode copiar, modificar, distribuir ou usar qualquer conteúdo sem autorização prévia por escrito."
+        ]
+      },
+      {
+        "title": "4. Uso do Site",
+        "content": [
+          "Você concorda em usar este site apenas para fins informativos e legais.",
+          "É proibido: tentar ganhar acesso não autorizado ao site; interferir com o funcionamento do site; usar o site para qualquer finalidade ilícita."
+        ]
+      },
+      {
+        "title": "5. Limitação de Responsabilidade",
+        "content": [
+          "A NomadWay não é responsável por danos diretos, indiretos, incidentais ou consequentes resultantes do uso ou incapacidade de usar nossos serviços.",
+          "Não garantimos que o uso deste site seja ininterrupto ou livre de erros."
+        ]
+      },
+      {
+        "title": "6. Política de Reembolso",
+        "content": [
+          "Consultoria gratuita: não elegível para reembolso.",
+          "Planos pagos (Mentoria Completa, VIP): reembolso disponível até 7 dias após a primeira sessão, se você não estiver satisfeito com os serviços prestados.",
+          "Após a primeira sessão e depois de 7 dias, não oferecemos reembolsos."
+        ]
+      },
+      {
+        "title": "7. Alterações nos Termos",
+        "content": [
+          "A NomadWay reserva-se o direito de atualizar estes termos a qualquer momento.",
+          "Continuando a usar nossos serviços após alterações, você concorda com os novos termos."
+        ]
+      },
+      {
+        "title": "8. Contato",
+        "content": [
+          "Para dúvidas sobre estes termos, entre em contato conosco: contato@nomadway.com.br"
+        ]
+      }
+    ]
+  },
+  "privacy": {
+    "title": "Política de Privacidade",
+    "lastUpdated": "Última atualização: 08/02/2026",
+    "sections": [
+      {
+        "title": "1. Coleta de Informações",
+        "content": [
+          "Coletamos informações que você nos fornece: nome, email, telefone, informações sobre sua situação profissional e imigratórias.",
+          "Automatizamos informações sobre acesso ao site: endereço IP, navegador, tempo de visita, páginas acessadas."
+        ]
+      },
+      {
+        "title": "2. Uso das Informações",
+        "content": [
+          "Usamos suas informações para: fornecer consultoria e mentoria; responder suas perguntas; melhorar nossos serviços; enviar comunicações relevantes.",
+          "Não compartilhamos suas informações com terceiros exceto quando necessário para fornecer os serviços requisitados (ex: conexão com advogados ou contadores)."
+        ]
+      },
+      {
+        "title": "3. Segurança dos Dados",
+        "content": [
+          "Implementamos medidas de segurança para proteger suas informações contra acesso, alteração ou destruição não autorizada.",
+          "No entanto, nenhum método de transmissão pela internet é 100% seguro e não podemos garantir segurança absoluta."
+        ]
+      },
+      {
+        "title": "4. Cookies",
+        "content": [
+          "Usamos cookies para melhorar a experiência do usuário, lembrar suas preferências e entender métricas de uso.",
+          "Você pode configurar seu navegador para recusar cookies, mas isso pode afetar a funcionalidade do site."
+        ]
+      },
+      {
+        "title": "5. Seus Direitos",
+        "content": [
+          "Você tem direito: acessar suas informações; solicitar correção de dados imprecisos; solicitar exclusão de seus dados; retirar consentimento para processamento de dados.",
+          "Para exercer esses direitos, entre em contato: contato@nomadway.com.br"
+        ]
+      },
+      {
+        "title": "6. Comunicações de Marketing",
+        "content": [
+          "Com seu consentimento, podemos enviar emails marketing sobre nossos serviços. Você pode se descadastrar a qualquer momento clicando 'Unsubscribe' no email.",
+          "Não compartilhamos suas informações para fins de marketing com terceiros."
+        ]
+      },
+      {
+        "title": "7. Política de Retenção",
+        "content": [
+          "Retemos suas informações enquanto necessário para fornecer nossos serviços e cumprir obrigações legais.",
+          "Após encerramento da relação, mantemos dados apenas pelo período necessário (normalmente 3 anos)."
+        ]
+      },
+      {
+        "title": "8. Legislação Aplicável",
+        "content": [
+          "Esta política de privacidade é regida pelas leis de Espanha (RGPD) e do Brasil (LGPD).",
+          "Qualquer disputa será resolvida nos tribunais competentes."
+        ]
+      },
+      {
+        "title": "9. Contato",
+        "content": [
+          "Para dúvidas sobre privacidade ou para exercer seus direitos: contato@nomadway.com.br"
+        ]
+      }
+    ]
   },
   "meta": {
     "home": {

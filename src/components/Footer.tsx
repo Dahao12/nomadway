@@ -139,7 +139,7 @@ export default function Footer({ dict, locale }: FooterProps) {
 
         {/* Disclaimer */}
         <div className="border-t border-gray-800 pt-8 pb-4">
-          <p className="text-xs text-gray-500 leading-relaxed mb-4">
+          <p className="text-xs text-gray-500 leading-relaxed mb-4 text-center">
             {dict.footer.disclaimer}
           </p>
           <p className="text-xs text-gray-500 text-center">

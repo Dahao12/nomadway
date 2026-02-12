@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://nomadway.com'),
   title: 'NomadWay - Consultoria para Nômades Digitais na Espanha',
   description: 'Consultoria especializada em visto de nômade digital, Lei Beckham e planejamento completo para viver e trabalhar na Espanha.',
+  icons: {
+    icon: '/favicon.png',
+  },
   keywords: ['nômade digital', 'visto espanha', 'lei beckham', 'consultoria', 'mentoria'],
   authors: [{ name: 'NomadWay' }],
   openGraph: {
@@ -38,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="pt">
+    <html>
       <body className={inter.className}>{children}</body>
     </html>
   )
