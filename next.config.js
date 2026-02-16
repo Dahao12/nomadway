@@ -1,10 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-  distDir: 'out',
-  // basePath e assetPrefix removidos para root domain (nomadway.com.br)
+  // Removido 'output: export' - Vercel suporta Next.js nativo
   images: {
-    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -13,7 +10,6 @@ const nextConfig = {
       },
     ],
   },
-  trailingSlash: true,
 }
 
 module.exports = nextConfig

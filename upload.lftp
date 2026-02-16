@@ -1,0 +1,6 @@
+open -u u608840078,5676484aS@@ 185.245.180.59
+set ftp:ssl-allow no
+set ssl:verify-certificate no
+cd public_html
+ls
+quit
