@@ -5,6 +5,13 @@ const nextConfig = {
   // basePath e assetPrefix removidos para root domain (nomadway.com.br)
   images: {
     unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
+      },
+    ],
   },
   trailingSlash: true,
 }

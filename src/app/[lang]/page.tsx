@@ -1,6 +1,7 @@
 import { getDictionary } from '@/lib/getDictionary'
 import Hero from '@/components/Hero'
 import CTASection from '@/components/CTASection'
+import LifestyleSection from '@/components/LifestyleSection'
 import { FaCheckCircle, FaUsers, FaNetworkWired, FaTrophy, FaPassport, FaCalculator, FaMapMarkedAlt } from 'react-icons/fa'
 
 export default async function HomePage({ params }: { params: { lang: string } }) {
@@ -122,6 +123,9 @@ export default async function HomePage({ params }: { params: { lang: string } })
           </div>
         </div>
       </section>
+
+      {/* Lifestyle / Image Section */}
+      <LifestyleSection locale={params.lang} />
 
       <CTASection dict={dict} locale={params.lang} />
     </>
