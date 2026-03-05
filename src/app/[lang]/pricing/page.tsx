@@ -32,16 +32,19 @@ export default async function PricingPage({ params }: { params: { lang: string }
       key: 'basic' as const,
       color: 'gray',
       popular: false,
+      serviceId: '30min-free',
     },
     {
       key: 'pro' as const,
       color: 'primary',
       popular: true,
+      serviceId: 'mentoria',
     },
     {
       key: 'vip' as const,
       color: 'secondary',
       popular: false,
+      serviceId: 'nomad-visa',
     },
   ]
 
@@ -91,9 +94,11 @@ export default async function PricingPage({ params }: { params: { lang: string }
                     <h3 className={`text-2xl font-bold mb-2 ${isPopular ? 'text-white' : 'text-gray-900'}`}>
                       {planData.name}
                     </h3>
-                    <div className={`text-4xl font-bold mb-2 ${isPopular ? 'text-white' : 'text-primary-600'}`}>
-                      {planData.price}
-                    </div>
+                    {planData.price && (
+                      <div className={`text-4xl font-bold mb-2 ${isPopular ? 'text-white' : 'text-primary-600'}`}>
+                        {planData.price}
+                      </div>
+                    )}
                     <p className={`text-sm ${isPopular ? 'text-primary-100' : 'text-gray-600'}`}>
                       {planData.description}
                     </p>
@@ -115,7 +120,7 @@ export default async function PricingPage({ params }: { params: { lang: string }
                   </ul>
 
                   <Link
-                    href={`/${params.lang}/contact`}
+                    href={`/${params.lang}/agendamento/booking?service=${plan.serviceId}`}
                     className={`block w-full text-center py-3 px-6 rounded-full font-semibold transition-all ${
                       isPopular
                         ? 'bg-white text-primary-600 hover:bg-gray-50'

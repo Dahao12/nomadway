@@ -2,7 +2,7 @@
   "nav": {
     "home": "Início",
     "services": "Serviços",
-    "pricing": "Preços",
+    "pricing": "Planos",
     "contact": "Contato"
   },
   "hero": {
@@ -99,47 +99,44 @@
     "title": "Planos e Investimento",
     "subtitle": "Escolha o plano ideal para o seu momento",
     "basic": {
-      "name": "Consultoria Inicial",
-      "price": "GRATUITA",
+      "name": "Consulta Gratuita",
+      "price": "GRÁTIS",
       "description": "Ideal para quem está começando a pesquisar",
       "features": [
-        "1 sessão de 30 minutos",
+        "30 minutos de consultoria",
         "Análise de elegibilidade",
-        "Roadmap personalizado",
-        "Checklist de documentos",
-        "Plano de ação inicial"
+        "Orientação inicial",
+        "Sem compromisso"
       ],
       "cta": "Começar Agora"
     },
     "pro": {
-      "name": "Mentoria Completa",
-      "price": "€999.90",
-      "description": "Acompanhamento completo do processo",
+      "name": "Mentoria Diagnóstico",
+      "price": "€99",
+      "description": "Sessão de diagnóstico - valor descontado do Nomad Visa",
       "popular": true,
       "features": [
-        "4 sessões de mentoria",
-        "Suporte visto",
-        "Revisão de documentos",
-        "Conexão com especialistas",
-        "Suporte WhatsApp",
-        "Grupo exclusivo de networking"
+        "60 minutos de consultoria",
+        "Análise completa do caso",
+        "Checklist personalizado",
+        "Plano de ação",
+        "Desconto no Nomad Visa"
       ],
-      "cta": "Plano Mais Popular"
+      "cta": "Agendar Diagnóstico"
     },
     "vip": {
-      "name": "VIP Total",
-      "price": "€2.497",
-      "description": "Concierge completo para sua mudança",
+      "name": "Nomad Visa Completo",
+      "price": "€1.499",
+      "description": "Processo completo de visto nômade digital",
       "features": [
-        "Sessões ilimitadas (3 meses)",
-        "Gestão completa do processo",
-        "Busca de moradia",
-        "Abertura de contas",
-        "Suporte 24/7",
-        "Acompanhamento presencial",
-        "Integração cultural"
+        "Análise completa",
+        "Montagem de documentos",
+        "Submissão da aplicação",
+        "Acompanhamento até aprovação",
+        "Suporte via WhatsApp",
+        "+€279 por dependente"
       ],
-      "cta": "Experiência VIP"
+      "cta": "Iniciar Processo"
     }
   },
   "contact": {
@@ -148,7 +145,7 @@
     "form": {
       "name": "Nome Completo",
       "email": "Email",
-      "phone": "Telefone (WhatsApp)",
+      "phone": "Telefone",
       "service": "Serviço de Interesse",
       "message": "Conte-nos sobre sua situação",
       "submit": "Enviar Mensagem",
@@ -157,14 +154,14 @@
     },
     "info": {
       "email": "contato@nomadway.com.br",
-      "whatsapp": "+34 612 45 59 82",
-      "hours": "Seg-Sex: 9h-18h (Horário Europa/Espanha)"
+      "hours": "Seg-Sex: 9h-18h (Horário Europa/Espanha)",
+      "offices": "Escritórios em Barcelona, Madrid e Toledo"
     }
   },
   "footer": {
     "tagline": "Sua ponte para a vida nômade na Espanha",
     "disclaimer": "A NomadWay oferece consultoria e mentoria informativa. Não prestamos serviços jurídicos ou contábeis. Para questões legais e fiscais, conectamos você com profissionais certificados.",
-    "rights": "© 2024 NomadWay. Todos os direitos reservados.",
+    "rights": "© 2026 NomadWay. Todos os direitos reservados.",
     "links": {
       "privacy": "Política de Privacidade",
       "terms": "Termos de Uso"
@@ -239,7 +236,7 @@
       {
         "title": "1. Coleta de Informações",
         "content": [
-          "Coletamos informações que você nos fornece: nome, email, telefone, informações sobre sua situação profissional e imigratórias.",
+          "Coletamos informações que você nos fornece: nome, email, informações sobre sua situação profissional e imigratórias.",
           "Automatizamos informações sobre acesso ao site: endereço IP, navegador, tempo de visita, páginas acessadas."
         ]
       },
@@ -310,8 +307,8 @@
       "description": "Consultoria de visto de nômade digital, mentoria fiscal com Lei Beckham e planejamento completo de mudança para Espanha. Suporte especializado."
     },
     "pricing": {
-      "title": "Planos e Preços - Investimento em sua Mudança | NomadWay",
-      "description": "Confira nossos planos de consultoria e mentoria para nômades digitais. Do básico ao VIP, encontre o investimento ideal para sua jornada na Espanha."
+      "title": "Planos - Consultoria para Nômades Digitais | NomadWay",
+      "description": "Confira nossos planos de consultoria e mentoria para nômades digitais. Do básico ao VIP, encontre o plano ideal para sua jornada na Espanha."
     },
     "contact": {
       "title": "Contato - Agende sua Consulta Gratuita | NomadWay",

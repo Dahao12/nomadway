@@ -2,7 +2,7 @@
   "nav": {
     "home": "Home",
     "services": "Services",
-    "pricing": "Pricing",
+    "pricing": "Plans",
     "contact": "Contact"
   },
   "hero": {
@@ -99,47 +99,44 @@
     "title": "Plans & Investment",
     "subtitle": "Choose the ideal plan for your moment",
     "basic": {
-      "name": "Initial Consulting",
-      "price": "GRATUITA",
+      "name": "Free Consultation",
+      "price": "FREE",
       "description": "Ideal for those starting to research",
       "features": [
-        "1 session of 30 minutes",
+        "30 minutes consultation",
         "Eligibility analysis",
-        "Personalized roadmap",
-        "Document checklist",
-        "Initial action plan"
+        "Initial guidance",
+        "No commitment"
       ],
       "cta": "Get Started"
     },
     "pro": {
-      "name": "Complete Mentorship",
-      "price": "€999.90",
-      "description": "Full process support",
+      "name": "Diagnostic Mentoring",
+      "price": "€99",
+      "description": "Diagnostic session - fee discounted from Nomad Visa",
       "popular": true,
       "features": [
-        "4 mentorship sessions",
-        "Visa support",
-        "Document review",
-        "Specialist connections",
-        "WhatsApp support",
-        "Exclusive networking group"
+        "60 minutes consultation",
+        "Complete case analysis",
+        "Personalized checklist",
+        "Action plan",
+        "Discount on Nomad Visa"
       ],
-      "cta": "Most Popular Plan"
+      "cta": "Book Diagnostic"
     },
     "vip": {
-      "name": "Total VIP",
-      "price": "€2,497",
-      "description": "Complete concierge for your move",
+      "name": "Nomad Visa Complete",
+      "price": "€1,499",
+      "description": "Complete digital nomad visa process",
       "features": [
-        "Unlimited sessions (3 months)",
-        "Complete process management",
-        "Housing search",
-        "Account opening",
-        "24/7 support",
-        "In-person support",
-        "Cultural integration"
+        "Complete analysis",
+        "Document preparation",
+        "Application submission",
+        "Support until approval",
+        "WhatsApp support",
+        "+€279 per dependent"
       ],
-      "cta": "VIP Experience"
+      "cta": "Start Process"
     }
   },
   "contact": {
@@ -148,7 +145,7 @@
     "form": {
       "name": "Full Name",
       "email": "Email",
-      "phone": "Phone (WhatsApp)",
+      "phone": "Phone",
       "service": "Service of Interest",
       "message": "Tell us about your situation",
       "submit": "Send Message",
@@ -157,14 +154,14 @@
     },
     "info": {
       "email": "contact@nomadway.com.br",
-      "whatsapp": "+34 612 45 59 82",
-      "hours": "Mon-Fri: 9am-6pm (Europe/Spain Time)"
+      "hours": "Mon-Fri: 9am-6pm (Europe/Spain Time)",
+      "offices": "Offices in Barcelona, Madrid and Toledo"
     }
   },
   "footer": {
     "tagline": "Your bridge to nomadic life in Spain",
     "disclaimer": "NomadWay offers informational consulting and mentorship. We do not provide legal or accounting services. For legal and tax matters, we connect you with certified professionals.",
-    "rights": "© 2024 NomadWay. All rights reserved.",
+    "rights": "© 2026 NomadWay. All rights reserved.",
     "links": {
       "privacy": "Privacy Policy",
       "terms": "Terms of Use"
@@ -239,7 +236,7 @@
       {
         "title": "1. Information Collection",
         "content": [
-          "We collect information you provide: name, email, phone, professional and immigration situation information.",
+          "We collect information you provide: name, email, professional and immigration situation information.",
           "We automatically collect site access information: IP address, browser, visit duration, pages accessed."
         ]
       },
@@ -310,8 +307,8 @@
       "description": "Digital nomad visa consulting, tax mentorship with Beckham Law and complete moving planning to Spain. Specialized support."
     },
     "pricing": {
-      "title": "Plans & Pricing - Investment in Your Move | NomadWay",
-      "description": "Check our consulting and mentorship plans for digital nomads. From basic to VIP, find the ideal investment for your journey in Spain."
+      "title": "Plans - Consulting for Digital Nomads | NomadWay",
+      "description": "Check our consulting and mentorship plans for digital nomads. From basic to VIP, find the ideal plan for your journey in Spain."
     },
     "contact": {
       "title": "Contact - Schedule Your Free Consultation | NomadWay",
