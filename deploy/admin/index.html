@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - NomadWay</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-confirmed { background: #d1fae5; color: #065f46; }
+    .status-cancelled { background: #fee2e2; color: #991b1b; }
+    .status-completed { background: #dbeafe; color: #1e40af; }
+    .tab-active { border-bottom: 2px solid #3b82f6; color: #3b82f6; }
+    .day-blocked { background: #fee2e2 !important; color: #991b1b; }
+    .day-has-bookings { background: #d1fae5; }
+    .slot-available { background: #f3f4f6; }
+    .slot-blocked { background: #fee2e2; color: #991b1b; text-decoration: line-through; }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <!-- Login Screen -->
+  <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-calendar-check text-white text-2xl"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-900">Admin NomadWay</h1>
+        <p class="text-gray-500 mt-2">Digite a senha para acessar</p>
+      </div>
+      <div class="space-y-4">
+        <input type="password" id="passwordInput" placeholder="Senha" 
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          onkeypress="if(event.key === 'Enter') login()">
+        <button onclick="login()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700">
+          Entrar
+        </button>
+        <p id="loginError" class="text-red-500 text-center text-sm hidden">Senha incorreta</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="mainApp" class="hidden">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-4 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+              <i class="fas fa-calendar-check text-white"></i>
+            </div>
+            <div>
+              <h1 class="font-bold text-gray-900">NomadWay</h1>
+              <p class="text-xs text-gray-500">Painel Administrativo</p>
+            </div>
+          </div>
+          <button onclick="logout()" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-sign-out-alt text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Tabs -->
+    <div class="bg-white border-b">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="flex gap-6">
+          <button onclick="showTab('dashboard')" id="tab-dashboard" class="py-4 px-2 font-medium tab-active">
+            <i class="fas fa-chart-pie mr-2"></i>Dashboard
+          </button>
+          <button onclick="showTab('bookings')" id="tab-bookings" class="py-4 px-2 font-medium text-gray-500 hover:text-gray-700">
+            <i class="fas fa-calendar-alt mr-2"></i>Agendamentos
+          </button>
+          <button onclick="showTab('new')" id="tab-new" class="py-4 px-2 font-medium text-gray-500 hover:text-gray-700">
+            <i class="fas fa-plus-circle mr-2"></i>Novo
+          </button>
+          <button onclick="showTab('blocks')" id="tab-blocks" class="py-4 px-2 font-medium text-gray-500 hover:text-gray-700">
+            <i class="fas fa-ban mr-2"></i>Bloqueios
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <main class="max-w-7xl mx-auto px-4 py-6">
+      <!-- Dashboard Tab -->
+      <div id="content-dashboard">
+        <!-- Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white rounded-xl p-4 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-clock text-yellow-600"></i>
+              </div>
+              <div>
+                <p class="text-2xl font-bold text-gray-900" id="stat-pending">0</p>
+                <p class="text-xs text-gray-500">Pendentes</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl p-4 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-check text-green-600"></i>
+              </div>
+              <div>
+                <p class="text-2xl font-bold text-gray-900" id="stat-confirmed">0</p>
+                <p class="text-xs text-gray-500">Confirmados</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl p-4 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-check-double text-blue-600"></i>
+              </div>
+              <div>
+                <p class="text-2xl font-bold text-gray-900" id="stat-completed">0</p>
+                <p class="text-xs text-gray-500">Concluídos</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl p-4 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-times text-red-600"></i>
+              </div>
+              <div>
+                <p class="text-2xl font-bold text-gray-900" id="stat-cancelled">0</p>
+                <p class="text-xs text-gray-500">Cancelados</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Bookings -->
+        <div class="bg-white rounded-xl shadow-sm">
+          <div class="p-4 border-b">
+            <h2 class="font-semibold text-gray-900">Agendamentos Recentes</h2>
+          </div>
+          <div id="recentBookings" class="divide-y">
+            <!-- Loaded dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Bookings Tab -->
+      <div id="content-bookings" class="hidden">
+        <div class="bg-white rounded-xl shadow-sm">
+          <div class="p-4 border-b flex items-center justify-between">
+            <h2 class="font-semibold text-gray-900">Todos os Agendamentos</h2>
+            <select id="statusFilter" onchange="loadBookings()" class="border rounded-lg px-3 py-2 text-sm">
+              <option value="">Todos</option>
+              <option value="pending">Pendentes</option>
+              <option value="confirmed">Confirmados</option>
+              <option value="completed">Concluídos</option>
+              <option value="cancelled">Cancelados</option>
+            </select>
+          </div>
+          <div id="bookingsList" class="divide-y">
+            <!-- Loaded dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- New Booking Tab -->
+      <div id="content-new" class="hidden">
+        <div class="max-w-2xl mx-auto">
+          <div class="bg-white rounded-xl shadow-sm p-6">
+            <h2 class="font-semibold text-gray-900 mb-6 flex items-center gap-2">
+              <i class="fas fa-plus-circle text-blue-600"></i>
+              Novo Agendamento
+            </h2>
+            <form id="newBookingForm" class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Serviço</label>
+                <select id="newService" class="w-full border rounded-lg px-4 py-3" required>
+                  <option value="30min-free">Consultoria Inicial (Grátis)</option>
+                  <option value="60min">Sessão 60min (€49)</option>
+                  <option value="90min-inperson">VIP Total (€3.000)</option>
+                </select>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Data</label>
+                  <input type="date" id="newDate" class="w-full border rounded-lg px-4 py-3" required>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Horário</label>
+                  <select id="newTime" class="w-full border rounded-lg px-4 py-3" required>
+                    <option value="">Selecione a data primeiro</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label>
+                <input type="text" id="newName" class="w-full border rounded-lg px-4 py-3" required>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input type="email" id="newEmail" class="w-full border rounded-lg px-4 py-3" required>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+                  <input type="tel" id="newPhone" class="w-full border rounded-lg px-4 py-3" placeholder="+55 11 99999-9999" required>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
+                <textarea id="newNotes" class="w-full border rounded-lg px-4 py-3" rows="2"></textarea>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="checkbox" id="newConfirmed" class="rounded">
+                <label for="newConfirmed" class="text-sm text-gray-700">Confirmar automaticamente</label>
+              </div>
+              <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700">
+                <i class="fas fa-plus mr-2"></i>Criar Agendamento
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blocks Tab -->
+      <div id="content-blocks" class="hidden">
+        <div class="grid md:grid-cols-2 gap-6">
+          <!-- Calendar -->
+          <div class="bg-white rounded-xl shadow-sm p-6">
+            <h2 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <i class="fas fa-calendar text-blue-600"></i>
+              Bloquear Datas
+            </h2>
+            <div class="flex items-center justify-between mb-4">
+              <button onclick="changeMonth(-1)" class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <span id="currentMonth" class="font-semibold"></span>
+              <button onclick="changeMonth(1)" class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+            <div class="grid grid-cols-7 gap-1 text-center text-xs text-gray-500 mb-2">
+              <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+            </div>
+            <div id="calendarDays" class="grid grid-cols-7 gap-1">
+              <!-- Generated dynamically -->
+            </div>
+            <div class="mt-4 flex flex-wrap items-center gap-3 text-xs">
+              <div class="flex items-center gap-1"><div class="w-3 h-3 bg-green-100 rounded"></div> Com agendamentos</div>
+              <div class="flex items-center gap-1"><div class="w-3 h-3 bg-red-100 rounded"></div> Bloqueado</div>
+              <div class="flex items-center gap-1"><div class="w-3 h-3 bg-gray-200 rounded"></div> Domingo (fechado)</div>
+            </div>
+            <div class="mt-2 text-xs text-gray-500">
+              <i class="fas fa-info-circle mr-1"></i>
+              Sábados: apenas horários da manhã disponíveis
+            </div>
+          </div>
+
+          <!-- Blocked List -->
+          <div class="bg-white rounded-xl shadow-sm p-6">
+            <h2 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <i class="fas fa-ban text-red-600"></i>
+              Datas Bloqueadas
+            </h2>
+            <div id="blockedList" class="space-y-2 max-h-64 overflow-y-auto">
+              <!-- Loaded dynamically -->
+            </div>
+            <button onclick="showBlockModal()" class="w-full mt-4 border-2 border-dashed border-gray-300 text-gray-500 py-3 rounded-lg hover:border-blue-500 hover:text-blue-500">
+              <i class="fas fa-plus mr-2"></i>Bloquear Horário/Dia
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Booking Modal -->
+  <div id="bookingModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div class="p-4 border-b flex items-center justify-between sticky top-0 bg-white">
+        <h3 class="font-semibold">Detalhes do Agendamento</h3>
+        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      <div id="modalContent" class="p-4">
+        <!-- Filled dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Block Modal -->
+  <div id="blockModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div class="p-4 border-b flex items-center justify-between sticky top-0 bg-white">
+        <h3 class="font-semibold">Bloquear Horários</h3>
+        <button onclick="closeBlockModal()" class="text-gray-400 hover:text-gray-600">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      <div class="p-4 space-y-4">
+        <div class="flex items-center gap-4 p-3 bg-blue-50 rounded-lg">
+          <input type="radio" name="blockType" id="blockTypeFull" value="full" checked class="w-4 h-4 text-blue-600">
+          <label for="blockTypeFull" class="cursor-pointer">
+            <span class="font-medium text-gray-900">Dia inteiro</span>
+            <span class="block text-sm text-gray-500">Bloquear todos os horários</span>
+          </label>
+        </div>
+        <div class="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+          <input type="radio" name="blockType" id="blockTypePartial" value="partial" class="w-4 h-4 text-blue-600">
+          <label for="blockTypePartial" class="cursor-pointer">
+            <span class="font-medium text-gray-900">Horários específicos</span>
+            <span class="block text-sm text-gray-500">Bloquear apenas um período</span>
+          </label>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Data Início</label>
+            <input type="date" id="blockStart" class="w-full border rounded-lg px-4 py-3">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Data Fim</label>
+            <input type="date" id="blockEnd" class="w-full border rounded-lg px-4 py-3" placeholder="Opcional">
+          </div>
+        </div>
+        <div id="timeBlockSection" class="hidden space-y-3">
+          <div class="p-3 bg-yellow-50 rounded-lg text-sm text-yellow-800">
+            <i class="fas fa-info-circle mr-1"></i>
+            Deixe vazio para bloquear dia inteiro
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Horário Início</label>
+              <select id="blockTimeStart" class="w-full border rounded-lg px-4 py-3">
+                <option value="">-- Dia todo --</option>
+                <option value="09:00">09:00</option>
+                <option value="09:30">09:30</option>
+                <option value="10:00">10:00</option>
+                <option value="10:30">10:30</option>
+                <option value="11:00">11:00</option>
+                <option value="11:30">11:30</option>
+                <option value="12:00">12:00</option>
+                <option value="14:00">14:00</option>
+                <option value="14:30">14:30</option>
+                <option value="15:00">15:00</option>
+                <option value="15:30">15:30</option>
+                <option value="16:00">16:00</option>
+                <option value="16:30">16:30</option>
+                <option value="17:00">17:00</option>
+                <option value="17:30">17:30</option>
+                <option value="18:00">18:00</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Horário Fim</label>
+              <select id="blockTimeEnd" class="w-full border rounded-lg px-4 py-3">
+                <option value="">-- Dia todo --</option>
+                <option value="09:30">09:30</option>
+                <option value="10:00">10:00</option>
+                <option value="10:30">10:30</option>
+                <option value="11:00">11:00</option>
+                <option value="11:30">11:30</option>
+                <option value="12:00">12:00</option>
+                <option value="12:30">12:30</option>
+                <option value="14:00">14:00</option>
+                <option value="14:30">14:30</option>
+                <option value="15:00">15:00</option>
+                <option value="15:30">15:30</option>
+                <option value="16:00">16:00</option>
+                <option value="16:30">16:30</option>
+                <option value="17:00">17:00</option>
+                <option value="17:30">17:30</option>
+                <option value="18:00">18:00</option>
+                <option value="18:30">18:30</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Motivo (opcional)</label>
+          <input type="text" id="blockReason" class="w-full border rounded-lg px-4 py-3" placeholder="Ex: Férias, Feriado, Almoço...">
+        </div>
+        <button onclick="createBlock()" class="w-full bg-red-600 text-white py-3 rounded-lg font-medium hover:bg-red-700">
+          <i class="fas fa-ban mr-2"></i>Bloquear
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'https://nomadway-api.vercel.app';
+    const ADMIN_KEY = 'nomadway2024';
+    let allBookings = [];
+    let blockedDates = [];
+    let currentMonth = new Date();
+
+    // Auth
+    function login() {
+      const password = document.getElementById('passwordInput').value;
+      if (password === ADMIN_KEY) {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('mainApp').classList.remove('hidden');
+        loadAll();
+      } else {
+        document.getElementById('loginError').classList.remove('hidden');
+      }
+    }
+
+    function logout() {
+      document.getElementById('loginScreen').classList.remove('hidden');
+      document.getElementById('mainApp').classList.add('hidden');
+      document.getElementById('passwordInput').value = '';
+    }
+
+    // Tabs
+    function showTab(tab) {
+      document.querySelectorAll('[id^="content-"]').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('[id^="tab-"]').forEach(el => {
+        el.classList.remove('tab-active');
+        el.classList.add('text-gray-500');
+      });
+      document.getElementById('content-' + tab).classList.remove('hidden');
+      document.getElementById('tab-' + tab).classList.add('tab-active');
+      document.getElementById('tab-' + tab).classList.remove('text-gray-500');
+    }
+
+    // Load all data
+    async function loadAll() {
+      await Promise.all([loadBookings(), loadBlocks()]);
+      renderCalendar();
+    }
+
+    // Bookings
+    async function loadStats() {
+      const stats = { pending: 0, confirmed: 0, completed: 0, cancelled: 0 };
+      allBookings.forEach(b => stats[b.status] = (stats[b.status] || 0) + 1);
+      document.getElementById('stat-pending').textContent = stats.pending;
+      document.getElementById('stat-confirmed').textContent = stats.confirmed;
+      document.getElementById('stat-completed').textContent = stats.completed;
+      document.getElementById('stat-cancelled').textContent = stats.cancelled;
+    }
+
+    async function loadBookings() {
+      const filter = document.getElementById('statusFilter')?.value || '';
+      try {
+        const response = await fetch(API_URL + '/api/bookings' + (filter ? '?status=' + filter : ''), {
+          headers: { 'Authorization': 'Bearer ' + ADMIN_KEY }
+        });
+        const result = await response.json();
+        allBookings = result.bookings || [];
+        loadStats();
+        renderBookings();
+        renderRecentBookings();
+      } catch (error) {
+        console.error('Error loading bookings:', error);
+      }
+    }
+
+    function renderRecentBookings() {
+      const recent = allBookings.slice(0, 5);
+      document.getElementById('recentBookings').innerHTML = recent.map(b => 
+        '<div class="p-4 flex items-center justify-between hover:bg-gray-50 cursor-pointer" onclick="showBookingDetail(\'' + b.id + '\')">' +
+          '<div class="flex items-center gap-3">' +
+            '<div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">' +
+              '<span class="text-blue-600 font-semibold">' + b.customer_name.charAt(0).toUpperCase() + '</span>' +
+            '</div>' +
+            '<div>' +
+              '<p class="font-medium text-gray-900">' + b.customer_name + '</p>' +
+              '<p class="text-sm text-gray-500">' + formatDate(b.booking_date) + ' às ' + (b.booking_time || '').substring(0, 5) + '</p>' +
+            '</div>' +
+          '</div>' +
+          '<span class="px-2 py-1 rounded-full text-xs font-medium status-' + b.status + '">' + getStatusText(b.status) + '</span>' +
+        '</div>'
+      ).join('') || '<div class="p-4 text-center text-gray-500">Nenhum agendamento</div>';
+    }
+
+    function renderBookings() {
+      document.getElementById('bookingsList').innerHTML = allBookings.map(b => 
+        '<div class="p-4 flex items-center justify-between hover:bg-gray-50 cursor-pointer" onclick="showBookingDetail(\'' + b.id + '\')">' +
+          '<div class="flex items-center gap-3">' +
+            '<div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">' +
+              '<span class="text-blue-600 font-semibold">' + b.customer_name.charAt(0).toUpperCase() + '</span>' +
+            '</div>' +
+            '<div>' +
+              '<p class="font-medium text-gray-900">' + b.customer_name + '</p>' +
+              '<p class="text-sm text-gray-500">' + formatDate(b.booking_date) + ' às ' + (b.booking_time || '').substring(0, 5) + '</p>' +
+            '</div>' +
+          '</div>' +
+          '<span class="px-2 py-1 rounded-full text-xs font-medium status-' + b.status + '">' + getStatusText(b.status) + '</span>' +
+        '</div>'
+      ).join('') || '<div class="p-8 text-center text-gray-500">Nenhum agendamento encontrado</div>';
+    }
+
+    function showBookingDetail(id) {
+      var booking = allBookings.find(function(b) { return b.id === id; });
+      if (!booking) return;
+      
+      var statusClass = 'status-' + booking.status;
+      var statusText = getStatusText(booking.status);
+      var cleanPhone = booking.customer_phone.replace(/[^0-9]/g, '');
+      var dateFormatted = formatDate(booking.booking_date);
+      var timeFormatted = (booking.booking_time || '').substring(0, 5);
+      
+      var buttonsHtml = '';
+      
+      if (booking.status === 'pending') {
+        buttonsHtml += '<button onclick="confirmAndSendWhatsApp(\'' + booking.id + '\', \'' + cleanPhone + '\', \'' + encodeURIComponent(booking.customer_name) + '\', \'' + encodeURIComponent(booking.service_name) + '\', \'' + dateFormatted + '\', \'' + timeFormatted + '\')" class="w-full bg-green-500 text-white py-4 rounded-xl font-semibold hover:bg-green-600 flex items-center justify-center gap-3 text-lg shadow-lg"><i class="fab fa-whatsapp text-2xl"></i> Confirmar e Enviar WhatsApp</button>';
+        buttonsHtml += '<div class="flex gap-2 mt-3">';
+        buttonsHtml += '<button onclick="cancelAndReschedule(\'' + booking.id + '\', \'' + cleanPhone + '\', \'' + encodeURIComponent(booking.customer_name) + '\', \'' + encodeURIComponent(booking.service_name) + '\', \'' + dateFormatted + '\', \'' + timeFormatted + '\')" class="flex-1 bg-red-50 text-red-600 py-2 rounded-lg font-medium hover:bg-red-100 flex items-center justify-center gap-2 text-sm"><i class="fas fa-calendar-times"></i> Cancelar e Reagendar</button>';
+        buttonsHtml += '</div>';
+      }
+      if (booking.status === 'confirmed') {
+        buttonsHtml += '<button onclick="sendWhatsAppConfirmation(\'' + cleanPhone + '\', \'' + encodeURIComponent(booking.customer_name) + '\', \'' + encodeURIComponent(booking.service_name) + '\', \'' + dateFormatted + '\', \'' + timeFormatted + '\')" class="w-full bg-green-500 text-white py-3 rounded-lg font-medium hover:bg-green-600 flex items-center justify-center gap-2 mb-2"><i class="fab fa-whatsapp text-xl"></i> Reenviar Confirmação</button>';
+        buttonsHtml += '<div class="flex gap-2">';
+        buttonsHtml += '<button onclick="updateStatus(\'' + booking.id + '\', \'completed\')" class="flex-1 bg-blue-500 text-white py-2 rounded-lg font-medium hover:bg-blue-600 flex items-center justify-center gap-2"><i class="fas fa-check-double"></i> Concluir</button>';
+        buttonsHtml += '<button onclick="cancelAndReschedule(\'' + booking.id + '\', \'' + cleanPhone + '\', \'' + encodeURIComponent(booking.customer_name) + '\', \'' + encodeURIComponent(booking.service_name) + '\', \'' + dateFormatted + '\', \'' + timeFormatted + '\')" class="flex-1 bg-red-50 text-red-600 py-2 rounded-lg font-medium hover:bg-red-100 flex items-center justify-center gap-2 text-sm"><i class="fas fa-times"></i> Cancelar</button>';
+        buttonsHtml += '</div>';
+      }
+      if (booking.status === 'cancelled') {
+        var rescheduleLink = 'https://wa.me/' + cleanPhone + '?text=' + encodeURIComponent('Olá ' + booking.customer_name + '! 👋\n\nVimos que seu agendamento foi cancelado.\n\nGostaria de reagendar? Acesse: nomadway.com.br/agendamento\n\nEstamos à disposição! 🚀');
+        buttonsHtml += '<a href="' + rescheduleLink + '" target="_blank" class="w-full bg-blue-500 text-white py-3 rounded-lg font-medium hover:bg-blue-600 flex items-center justify-center gap-2"><i class="fab fa-whatsapp text-xl"></i> Oferecer Reagendamento</a>';
+      }
+      if (booking.status === 'completed') {
+        var thankLink = 'https://wa.me/' + cleanPhone + '?text=' + encodeURIComponent('Olá ' + booking.customer_name + '! 🙌\n\nObrigado por escolher a NomadWay!\n\nEsperamos que tenha sido útil. Se precisar de algo mais, estamos aqui.\n\nAté a próxima! 🚀');
+        buttonsHtml += '<a href="' + thankLink + '" target="_blank" class="w-full bg-green-500 text-white py-3 rounded-lg font-medium hover:bg-green-600 flex items-center justify-center gap-2"><i class="fab fa-whatsapp text-xl"></i> Enviar Agradecimento</a>';
+      }
+      
+      document.getElementById('modalContent').innerHTML = 
+        '<div class="space-y-4">' +
+          '<div class="flex items-center justify-between">' +
+            '<span class="px-3 py-1 rounded-full text-sm font-medium ' + statusClass + '">' + statusText + '</span>' +
+            '<span class="text-sm text-gray-500 font-mono">' + booking.booking_code + '</span>' +
+          '</div>' +
+          '<div class="bg-gray-50 rounded-xl p-4">' +
+            '<p class="text-xs text-gray-500 mb-1">Cliente</p>' +
+            '<p class="font-semibold text-gray-900">' + booking.customer_name + '</p>' +
+            '<p class="text-sm text-gray-600">' + booking.customer_email + '</p>' +
+            '<a href="https://wa.me/' + cleanPhone + '" target="_blank" class="inline-flex items-center gap-2 text-green-600 text-sm mt-2 font-medium">' +
+              '<i class="fab fa-whatsapp text-lg"></i> ' + booking.customer_phone +
+            '</a>' +
+          '</div>' +
+          '<div class="grid grid-cols-2 gap-4">' +
+            '<div>' +
+              '<p class="text-xs text-gray-500 mb-1">Serviço</p>' +
+              '<p class="font-medium text-gray-900">' + booking.service_name + '</p>' +
+            '</div>' +
+            '<div>' +
+              '<p class="text-xs text-gray-500 mb-1">Valor</p>' +
+              '<p class="font-medium text-gray-900">' + (booking.price_cents === 0 ? 'Grátis' : '€' + (booking.price_cents / 100).toLocaleString()) + '</p>' +
+            '</div>' +
+            '<div>' +
+              '<p class="text-xs text-gray-500 mb-1">Data</p>' +
+              '<p class="font-medium text-gray-900">' + dateFormatted + '</p>' +
+            '</div>' +
+            '<div>' +
+              '<p class="text-xs text-gray-500 mb-1">Horário</p>' +
+              '<p class="font-medium text-gray-900">' + timeFormatted + ' (Madrid)</p>' +
+            '</div>' +
+          '</div>' +
+          (booking.customer_notes ? '<div><p class="text-xs text-gray-500 mb-1">Observações</p><p class="text-sm text-gray-700 bg-gray-50 rounded-lg p-3">' + booking.customer_notes + '</p></div>' : '') +
+          '<div class="pt-4 border-t border-gray-200">' + buttonsHtml + '</div>' +
+        '</div>';
+      
+      document.getElementById('bookingModal').classList.remove('hidden');
+      document.getElementById('bookingModal').classList.add('flex');
+    }
+
+    function closeModal() {
+      document.getElementById('bookingModal').classList.add('hidden');
+      document.getElementById('bookingModal').classList.remove('flex');
+    }
+
+    function getStatusText(status) {
+      return { pending: 'Pendente', confirmed: 'Confirmado', cancelled: 'Cancelado', completed: 'Concluído' }[status] || status;
+    }
+
+    function formatDate(dateStr) {
+      var date = new Date(dateStr + 'T12:00:00');
+      var days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+      var months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      return days[date.getDay()] + ', ' + date.getDate() + ' ' + months[date.getMonth()];
+    }
+
+    async function updateStatus(id, status) {
+      try {
+        var response = await fetch(API_URL + '/api/bookings/' + id, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ADMIN_KEY },
+          body: JSON.stringify({ status: status })
+        });
+        var result = await response.json();
+        if (response.ok && result.success) {
+          closeModal();
+          await loadBookings();
+        } else {
+          alert('Erro ao atualizar: ' + (result.error || 'Erro desconhecido'));
+        }
+      } catch (error) {
+        console.error('Error updating status:', error);
+        alert('Erro de conexão. Tente novamente.');
+      }
+    }
+
+    async function updateStatusSilent(id, status) {
+      try {
+        var response = await fetch(API_URL + '/api/bookings/' + id, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ADMIN_KEY },
+          body: JSON.stringify({ status: status })
+        });
+        return response.ok;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    async function confirmAndSendWhatsApp(id, phone, name, service, date, time) {
+      name = decodeURIComponent(name);
+      service = decodeURIComponent(service);
+      await updateStatusSilent(id, 'confirmed');
+      var message = '✅ *NomadWay - Agendamento CONFIRMADO!*\n\n━━━━━━━━━━━━━━━━━━━━\n\nOlá ' + name + '!\n\n🎉 Seu agendamento foi *CONFIRMADO*!\n\n📅 *Data:* ' + date + '\n🕐 *Horário:* ' + time + ' (Horário de Madrid)\n🎯 *Serviço:* ' + service + '\n\n━━━━━━━━━━━━━━━━━━━━\n\n📍 *Como participar:*\nNo horário combinado, entraremos em contato via WhatsApp ou Google Meet.\n\nPrecisa cancelar ou reagendar?\n🔗 nomadway.com.br/pt/agendamento/manage?code=' + id + '\n\nEstamos ansiosos para te ajudar! 🚀\n\n_Equipe NomadWay_\n📱 +34 612 45 59 82';
+      window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(message), '_blank');
+      closeModal();
+      await loadBookings();
+    }
+
+    async function cancelAndReschedule(id, phone, name, service, date, time) {
+      name = decodeURIComponent(name);
+      service = decodeURIComponent(service);
+      if (id) await updateStatusSilent(id, 'cancelled');
+      var message = '🔄 *NomadWay - Precisamos Reagendar*\n\n━━━━━━━━━━━━━━━━━━━━\n\nOlá ' + name + '!\n\nInfelizmente não será possível manter seu agendamento:\n\n📅 *Data:* ' + date + '\n🕐 *Horário:* ' + time + '\n🎯 *Serviço:* ' + service + '\n\n━━━━━━━━━━━━━━━━━━━━\n\nGostaríamos de oferecer um novo horário!\n\n🔗 *Agende novamente:*\nnomadway.com.br/agendamento\n\nOu responda esta mensagem com sua preferência de data/horário.\n\nPedimos desculpas pelo inconveniente. 🙏\n\n_Equipe NomadWay_\n📱 +34 612 45 59 82';
+      window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(message), '_blank');
+      if (id) {
+        closeModal();
+        await loadBookings();
+      }
+    }
+
+    function sendWhatsAppConfirmation(phone, name, service, date, time) {
+      name = decodeURIComponent(name);
+      service = decodeURIComponent(service);
+      var message = '✅ *NomadWay - Agendamento CONFIRMADO!*\n\n━━━━━━━━━━━━━━━━━━━━\n\nOlá ' + name + '!\n\n🎉 Seu agendamento está confirmado!\n\n📅 *Data:* ' + date + '\n🕐 *Horário:* ' + time + ' (Horário de Madrid)\n🎯 *Serviço:* ' + service + '\n\n━━━━━━━━━━━━━━━━━━━━\n\nEstamos ansiosos para te ajudar! 🚀\n\n_Equipe NomadWay_\n📱 +34 612 45 59 82';
+      window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(message), '_blank');
+    }
+
+    // New Booking
+    document.getElementById('newDate').addEventListener('change', async function() {
+      const date = this.value;
+      const timeSelect = document.getElementById('newTime');
+      timeSelect.innerHTML = '<option value="">Carregando...</option>';
+      
+      try {
+        const response = await fetch(API_URL + '/api/slots?date=' + date);
+        const result = await response.json();
+        
+        if (result.slots && result.slots.length > 0) {
+          timeSelect.innerHTML = result.slots.map(s => 
+            '<option value="' + s.time + '">' + s.time.substring(0, 5) + (s.available ? '' : ' (indisponível)') + '</option>'
+          ).join('');
+        } else {
+          timeSelect.innerHTML = '<option value="">Nenhum horário disponível</option>';
+        }
+      } catch (error) {
+        timeSelect.innerHTML = '<option value="">Erro ao carregar</option>';
+      }
+    });
+
+    document.getElementById('newBookingForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const data = {
+        serviceId: document.getElementById('newService').value,
+        date: document.getElementById('newDate').value,
+        time: document.getElementById('newTime').value,
+        name: document.getElementById('newName').value,
+        email: document.getElementById('newEmail').value,
+        phone: document.getElementById('newPhone').value,
+        notes: document.getElementById('newNotes').value,
+        lang: 'pt'
+      };
+      
+      if (!data.time) {
+        alert('Selecione um horário');
+        return;
+      }
+      
+      try {
+        const response = await fetch(API_URL + '/api/bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+          // Auto-confirm if checked
+          if (document.getElementById('newConfirmed').checked) {
+            await fetch(API_URL + '/api/bookings/' + result.booking.id, {
+              method: 'PUT',
+              headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + ADMIN_KEY
+              },
+              body: JSON.stringify({ status: 'confirmed' })
+            });
+          }
+          
+          alert('Agendamento criado com sucesso!');
+          document.getElementById('newBookingForm').reset();
+          document.getElementById('newTime').innerHTML = '<option value="">Selecione a data primeiro</option>';
+          showTab('bookings');
+          loadBookings();
+        } else {
+          alert('Erro: ' + (result.error || 'Erro ao criar agendamento'));
+        }
+      } catch (error) {
+        alert('Erro de conexão. Tente novamente.');
+      }
+    });
+
+    // Blocks
+    async function loadBlocks() {
+      try {
+        const response = await fetch(API_URL + '/api/blocks', {
+          headers: { 'Authorization': 'Bearer ' + ADMIN_KEY }
+        });
+        const result = await response.json();
+        blockedDates = result.blocks || [];
+        renderBlockedList();
+      } catch (error) {
+        console.error('Error loading blocks:', error);
+      }
+    }
+
+    function renderBlockedList() {
+      const list = document.getElementById('blockedList');
+      if (blockedDates.length === 0) {
+        list.innerHTML = '<div class="text-center text-gray-500 py-4">Nenhuma data bloqueada</div>';
+        return;
+      }
+      list.innerHTML = blockedDates.map(b => {
+        const dateStr = formatDate(b.start_date) + (b.end_date !== b.start_date ? ' - ' + formatDate(b.end_date) : '');
+        const timeStr = b.start_time && b.end_time 
+          ? '<span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded ml-2">' + b.start_time.substring(0,5) + ' - ' + b.end_time.substring(0,5) + '</span>'
+          : '<span class="text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded ml-2">Dia todo</span>';
+        return '<div class="flex items-center justify-between p-3 bg-red-50 rounded-lg mb-2">' +
+          '<div>' +
+            '<p class="font-medium text-gray-900">' + dateStr + timeStr + '</p>' +
+            (b.reason ? '<p class="text-sm text-gray-500 mt-1">' + b.reason + '</p>' : '') +
+          '</div>' +
+          '<button onclick="deleteBlock(\'' + b.id + '\')" class="text-red-600 hover:text-red-800 p-2">' +
+            '<i class="fas fa-trash"></i>' +
+          '</button>' +
+        '</div>';
+      }).join('');
+    }
+
+    function renderCalendar() {
+      const year = currentMonth.getFullYear();
+      const month = currentMonth.getMonth();
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const startDay = firstDay.getDay();
+      
+      document.getElementById('currentMonth').textContent = 
+        new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(currentMonth);
+      
+      let html = '';
+      
+      // Empty cells before first day
+      for (let i = 0; i < startDay; i++) {
+        html += '<div class="p-2"></div>';
+      }
+      
+      // Days of month
+      for (let day = 1; day <= lastDay.getDate(); day++) {
+        const date = new Date(year, month, day);
+        const dateStr = date.toISOString().split('T')[0];
+        const dayOfWeek = date.getDay();
+        const isSunday = dayOfWeek === 0;
+        const isSaturday = dayOfWeek === 6;
+        const isBlocked = blockedDates.some(b => dateStr >= b.start_date && dateStr <= b.end_date);
+        const hasBookings = allBookings.some(b => b.booking_date === dateStr);
+        const isToday = new Date().toDateString() === date.toDateString();
+        const isPast = date < new Date(new Date().setHours(0,0,0,0));
+        
+        let classes = 'p-2 text-center rounded-lg ';
+        if (isSunday) {
+          classes += 'bg-gray-200 text-gray-400 cursor-not-allowed ';
+        } else if (isBlocked) {
+          classes += 'day-blocked cursor-pointer hover:opacity-80 ';
+        } else if (hasBookings) {
+          classes += 'day-has-bookings cursor-pointer hover:opacity-80 ';
+        } else {
+          classes += 'cursor-pointer hover:bg-gray-100 ';
+        }
+        if (isToday) classes += 'ring-2 ring-blue-500 ';
+        if (isPast && !isSunday) classes += 'text-gray-400 ';
+        
+        const onclick = isSunday ? '' : 'onclick="toggleBlockDate(\'' + dateStr + '\')"';
+        const satLabel = isSaturday ? ' title="Sábado - apenas manhã"' : '';
+        const sunLabel = isSunday ? ' title="Domingo - fechado"' : '';
+        
+        html += '<div class="' + classes + '" ' + onclick + satLabel + sunLabel + '>' + day + '</div>';
+      }
+      
+      document.getElementById('calendarDays').innerHTML = html;
+    }
+
+    function changeMonth(delta) {
+      currentMonth.setMonth(currentMonth.getMonth() + delta);
+      renderCalendar();
+    }
+
+    async function toggleBlockDate(dateStr) {
+      const exists = blockedDates.find(b => b.start_date === dateStr && b.end_date === dateStr);
+      
+      if (exists) {
+        await deleteBlock(exists.id);
+      } else {
+        await createBlockSingle(dateStr);
+      }
+    }
+
+    async function createBlockSingle(dateStr) {
+      try {
+        const response = await fetch(API_URL + '/api/blocks', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + ADMIN_KEY
+          },
+          body: JSON.stringify({ startDate: dateStr, endDate: dateStr })
+        });
+        const result = await response.json();
+        if (result.success) {
+          await loadBlocks();
+          renderCalendar();
+        }
+      } catch (error) {
+        console.error('Error creating block:', error);
+      }
+    }
+
+    function showBlockModal() {
+      document.getElementById('blockModal').classList.remove('hidden');
+      document.getElementById('blockModal').classList.add('flex');
+      document.getElementById('blockStart').value = '';
+      document.getElementById('blockEnd').value = '';
+      document.getElementById('blockReason').value = '';
+      document.getElementById('blockTimeStart').value = '';
+      document.getElementById('blockTimeEnd').value = '';
+      document.getElementById('blockTypeFull').checked = true;
+      document.getElementById('timeBlockSection').classList.add('hidden');
+    }
+
+    // Toggle time section based on block type
+    document.querySelectorAll('input[name="blockType"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        const timeSection = document.getElementById('timeBlockSection');
+        if (this.value === 'partial') {
+          timeSection.classList.remove('hidden');
+        } else {
+          timeSection.classList.add('hidden');
+          document.getElementById('blockTimeStart').value = '';
+          document.getElementById('blockTimeEnd').value = '';
+        }
+      });
+    });
+
+    function closeBlockModal() {
+      document.getElementById('blockModal').classList.add('hidden');
+      document.getElementById('blockModal').classList.remove('flex');
+    }
+
+    async function createBlock() {
+      const start = document.getElementById('blockStart').value;
+      const end = document.getElementById('blockEnd').value || start;
+      const reason = document.getElementById('blockReason').value;
+      const isPartial = document.getElementById('blockTypePartial').checked;
+      const startTime = document.getElementById('blockTimeStart').value;
+      const endTime = document.getElementById('blockTimeEnd').value;
+      
+      if (!start) {
+        alert('Selecione a data de início');
+        return;
+      }
+      
+      if (isPartial && startTime && endTime && startTime >= endTime) {
+        alert('O horário de início deve ser menor que o horário de fim');
+        return;
+      }
+      
+      try {
+        const response = await fetch(API_URL + '/api/blocks', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + ADMIN_KEY
+          },
+          body: JSON.stringify({ 
+            startDate: start, 
+            endDate: end, 
+            reason: reason,
+            startTime: isPartial ? startTime : null,
+            endTime: isPartial ? endTime : null
+          })
+        });
+        const result = await response.json();
+        if (result.success) {
+          closeBlockModal();
+          await loadBlocks();
+          renderCalendar();
+        } else {
+          alert('Erro ao criar bloqueio: ' + (result.error || 'Erro desconhecido'));
+        }
+      } catch (error) {
+        console.error('Error creating block:', error);
+        alert('Erro de conexão. Tente novamente.');
+      }
+    }
+
+    async function deleteBlock(id) {
+      if (!confirm('Deseja remover este bloqueio?')) return;
+      
+      try {
+        const response = await fetch(API_URL + '/api/blocks/' + id, {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + ADMIN_KEY }
+        });
+        const result = await response.json();
+        if (result.success) {
+          await loadBlocks();
+          renderCalendar();
+        }
+      } catch (error) {
+        console.error('Error deleting block:', error);
+      }
+    }
+
+    // Close modals on outside click
+    document.getElementById('bookingModal').addEventListener('click', function(e) {
+      if (e.target.id === 'bookingModal') closeModal();
+    });
+    document.getElementById('blockModal').addEventListener('click', function(e) {
+      if (e.target.id === 'blockModal') closeBlockModal();
+    });
+
+    // Set min date for new booking
+    document.getElementById('newDate').min = new Date().toISOString().split('T')[0];
+  </script>
+</body>
+</html>

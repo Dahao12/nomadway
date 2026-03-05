@@ -139,6 +139,16 @@
       "cta": "Start Process"
     }
   },
+  "additional_services": {
+    "title": "Additional Services",
+    "items": {
+      "relocation": {
+        "name": "Relocation",
+        "price": "€99",
+        "description": "Consulting on housing, living costs and local integration"
+      }
+    }
+  },
   "contact": {
     "title": "Get in Touch",
     "subtitle": "We're here to help you achieve your dream of living in Spain",

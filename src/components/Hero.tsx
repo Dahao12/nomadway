@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { FaArrowRight, FaWhatsapp, FaStar, FaUsers, FaAward, FaCheckCircle } from 'react-icons/fa'
+import { FaArrowRight, FaWhatsapp, FaStar, FaUsers, FaAward, FaCheckCircle, FaCalendarAlt } from 'react-icons/fa'
 
 interface HeroProps {
   dict: any
@@ -107,10 +107,10 @@ export default function Hero({ dict, locale }: HeroProps) {
               }`}
             >
               <Link
-                href={`/${locale}/contact`}
+                href={`/${locale}/agendamento/booking?service=30min-free`}
                 className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-full font-bold hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
               >
-                <FaWhatsapp size={22} />
+                <FaCalendarAlt size={22} />
                 <span>{dict.hero.cta}</span>
                 <FaArrowRight className="group-hover:translate-x-2 transition-transform" />
               </Link>
@@ -159,7 +159,7 @@ export default function Hero({ dict, locale }: HeroProps) {
           >
             <div className="relative h-[400px] sm:h-[500px] rounded-3xl overflow-hidden shadow-2xl">
               <Image
-                src="https://images.unsplash.com/photo-1521737711867-e35b0a2c345e?w=800&q=80"
+                src="https://images.unsplash.com/photo-1497215842964-222b430dc094?w=800&q=80"
                 alt="Digital Nomad Working in Barcelona"
                 fill
                 className="object-cover"
@@ -196,7 +196,7 @@ export default function Hero({ dict, locale }: HeroProps) {
             { value: '200+', label: locale === 'pt' ? 'Clientes Satisfeitos' : 'Happy Clients', icon: FaUsers },
             { value: '98%', label: locale === 'pt' ? 'Taxa de Sucesso' : 'Success Rate', icon: FaCheckCircle },
             { value: '2K+', label: locale === 'pt' ? 'Nômades Conectados' : 'Nomads Network', icon: FaStar },
-            { value: '40+', label: locale === 'pt' ? 'Países Atendidos' : 'Countries Served', icon: FaAward },
+            { value: '10', label: locale === 'pt' ? 'Países Atendidos' : 'Countries Served', icon: FaAward },
           ].map((stat, idx) => (
             <div
               key={idx}

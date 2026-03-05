@@ -1,0 +1,16 @@
+{
+  "name": "NomadWay",
+  "short_name": "NomadWay",
+  "description": "Consultoria para nômades digitais na Espanha",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ef4444",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

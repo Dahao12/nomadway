@@ -19,7 +19,7 @@ export default function LifestyleSection({ locale }: LifestyleSectionProps) {
         location: 'Barcelona'
       },
       {
-        src: 'https://images.unsplash.com/photo-1539037119270-d9cab9f45042?w=600&q=80',
+        src: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80',
         alt: 'Família em Madrid',
         label: 'Vida em Família',
         location: 'Madrid'
@@ -31,7 +31,7 @@ export default function LifestyleSection({ locale }: LifestyleSectionProps) {
         location: 'Valencia'
       },
       {
-        src: 'https://images.unsplash.com/photo-1559028012-481c04fa7023?w=600&q=80',
+        src: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600&q=80',
         alt: 'Lifestyle Barcelona',
         label: 'Lifestyle',
         location: 'Barcelona'
@@ -54,7 +54,7 @@ export default function LifestyleSection({ locale }: LifestyleSectionProps) {
         location: 'Barcelona'
       },
       {
-        src: 'https://images.unsplash.com/photo-1539037119270-d9cab9f45042?w=600&q=80',
+        src: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80',
         alt: 'Family in Madrid',
         label: 'Family Life',
         location: 'Madrid'
@@ -66,7 +66,7 @@ export default function LifestyleSection({ locale }: LifestyleSectionProps) {
         location: 'Valencia'
       },
       {
-        src: 'https://images.unsplash.com/photo-1559028012-481c04fa7023?w=600&q=80',
+        src: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600&q=80',
         alt: 'Lifestyle Barcelona',
         label: 'Lifestyle',
         location: 'Barcelona'

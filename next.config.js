@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Removido 'output: export' - Vercel suporta Next.js nativo
+  // output: 'export' - disabled for Vercel deployment
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -10,6 +11,7 @@ const nextConfig = {
       },
     ],
   },
+  trailingSlash: true,
 }
 
 module.exports = nextConfig

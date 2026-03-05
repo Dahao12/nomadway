@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Dados - NomadWay</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            padding: 15px;
+            color: #1a1a2e;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #1a1a2e;
+            padding: 25px 35px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .logo-container {
+            flex-shrink: 0;
+        }
+        
+        .logo {
+            height: 50px;
+            filter: brightness(0) invert(1);
+        }
+        
+        .header-text {
+            flex: 1;
+        }
+        
+        .header h1 {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .header .subtitle {
+            color: #e94560;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        .content {
+            padding: 30px 35px;
+        }
+        
+        .section {
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .section:last-of-type {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        
+        .section-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: #e94560;
+            color: white;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .fields-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px 20px;
+        }
+        
+        .fields-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px 15px;
+        }
+        
+        .field-full {
+            grid-column: 1 / -1;
+        }
+        
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .field-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .field-input {
+            border: none;
+            border-bottom: 1.5px solid #d1d5db;
+            padding: 6px 0;
+            font-size: 13px;
+            color: #1a1a2e;
+            background: transparent;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+        
+        .field-input:focus {
+            border-bottom-color: #e94560;
+        }
+        
+        .field-input::placeholder {
+            color: #9ca3af;
+        }
+        
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        
+        .radio-item input[type="radio"],
+        .radio-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #e94560;
+            cursor: pointer;
+        }
+        
+        .radio-group-vertical {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .declaration-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 16px 18px;
+        }
+        
+        .declaration-box h4 {
+            font-size: 12px;
+            font-weight: 600;
+            color: #991b1b;
+            margin-bottom: 12px;
+        }
+        
+        .declaration-box ul {
+            list-style: none;
+        }
+        
+        .declaration-box li {
+            font-size: 12px;
+            color: #4a4a6a;
+            margin-bottom: 8px;
+            padding-left: 16px;
+            position: relative;
+            line-height: 1.5;
+        }
+        
+        .declaration-box li::before {
+            content: "•";
+            color: #e94560;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        
+        .signature-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 25px;
+            padding-top: 20px;
+        }
+        
+        .signature-field {
+            text-align: center;
+        }
+        
+        .signature-line {
+            border-bottom: 1.5px solid #1a1a2e;
+            height: 35px;
+            margin-bottom: 6px;
+        }
+        
+        .signature-label {
+            font-size: 10px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 15px 35px;
+            text-align: center;
+            font-size: 10px;
+            color: #6b7280;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .footer .confidential {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .footer .lock-icon {
+            font-size: 12px;
+        }
+        
+        .textarea-field {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 13px;
+            min-height: 80px;
+            resize: vertical;
+            outline: none;
+        }
+        
+        .textarea-field:focus {
+            border-color: #e94560;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+            
+            .section {
+                break-inside: avoid;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .fields-grid, .fields-grid-3, .signature-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-container">
+                <img src="logo.png" alt="NomadWay" class="logo">
+            </div>
+            <div class="header-text">
+                <h1>FORMULÁRIO DE DADOS</h1>
+                <div class="subtitle">Contratação de Serviços de Visto de Nômade Digital na Espanha</div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- 1. DADOS PESSOAIS -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-number">1</span>
+                    <span class="section-title">DADOS PESSOAIS</span>
+                </div>
+                <div class="fields-grid">
+                    <div class="field field-full">
+                        <label class="field-label">Nome completo</label>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field field-full">
+                        <label class="field-label">Nome social (se houver)</label>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Data de nascimento</label>
+                        <input type="text" class="field-input" placeholder="DD/MM/AAAA">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Nacionalidade</label>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Estado civil</label>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field field-full">
+                        <label class="field-label">Sexo</label>
+                        <div class="radio-group">
+                            <label class="radio-item"><input type="radio" name="sexo"> Feminino</label>
+                            <label class="radio-item"><input type="radio" name="sexo"> Masculino</label>
+                            <label class="radio-item"><input type="radio" name="sexo"> Outro</label>
+                            <label class="radio-item"><input type="radio" name="sexo"> Prefiro não informar</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 2. DOCUMENTOS -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-number">2</span>
+                    <span class="section-title">DOCUMENTOS</span>
+                </div>
+                <div class="fields-grid">
+                    <div class="field">
+                        <label class="field-label">CPF</label>
+                        <input type="text" class="field-input" placeholder="000.000.000-00">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">RG / Documento de Identidade</label>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Órgão emissor</label>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">UF</label>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Data de emissão</label>
+                        <input type="text" class="field-input" placeholder="DD/MM/AAAA">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Passaporte</label>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Validade do passaporte</label>
+                        <input type="text" class="field-input" placeholder="DD/MM/AAAA">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 3. ENDEREÇO COMPLETO -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-number">3</span>
+                    <span class="section-title">ENDEREÇO COMPLETO</span>
+                </div>
+                <div class="fields-grid">
+                    <div class="field field-full">
+                        <label class="field-label">Rua / Avenida</label>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Número</label>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Complemento</label>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Bairro</label>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Cidade</label>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Estado</label>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">País</label>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">CEP / Código Postal</label>
+                        <input type="text" class="field-input">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 4. CONTATO -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-number">4</span>
+                    <span class="section-title">CONTATO</span>
+                </div>
+                <div class="fields-grid">
+                    <div class="field">
+                        <label class="field-label">Telefone principal</label>
+                        <input type="text" class="field-input" placeholder="+55 (__) _____-____">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Telefone secundário</label>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field field-full">
+                        <label class="field-label">E-mail</label>
+                        <input type="email" class="field-input">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 5. DADOS PROFISSIONAIS -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-number">5</span>
+                    <span class="section-title">DADOS PROFISSIONAIS</span>
+                </div>
+                <div class="fields-grid">
+                    <div class="field">
+                        <label class="field-label">Profissão / Cargo</label>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Empresa / Instituição</label>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field field-full">
+                        <label class="field-label">Tempo de atuação</label>
+                        <input type="text" class="field-input">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 6. INFORMAÇÕES ADICIONAIS -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-number">6</span>
+                    <span class="section-title">INFORMAÇÕES ADICIONAIS</span>
+                </div>
+                <div class="field field-full">
+                    <textarea class="textarea-field" placeholder="Espaço para observações ou informações complementares..."></textarea>
+                </div>
+            </div>
+            
+            <!-- 7. SERVIÇO E PAGAMENTO -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-number">7</span>
+                    <span class="section-title">SERVIÇO E PAGAMENTO</span>
+                </div>
+                <div class="fields-grid">
+                    <div class="field field-full">
+                        <label class="field-label">Serviço contratado</label>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field field-full">
+                        <label class="field-label">Forma de pagamento</label>
+                        <div class="radio-group radio-group-vertical">
+                            <label class="radio-item"><input type="radio" name="pagamento"> À vista em euros (€) – transferência internacional</label>
+                            <label class="radio-item"><input type="radio" name="pagamento"> À vista em reais (R$) – câmbio calculado no dia</label>
+                            <label class="radio-item"><input type="radio" name="pagamento"> Entrada de 50% + 50% na entrega dos documentos</label>
+                            <label class="radio-item"><input type="radio" name="pagamento"> Cartão de crédito à vista (em € ou R$)</label>
+                            <label class="radio-item"><input type="radio" name="pagamento"> Cartão parcelado (juros por conta do cliente)</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 8. DECLARAÇÃO -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-number">8</span>
+                    <span class="section-title">DECLARAÇÃO</span>
+                </div>
+                <div class="declaration-box">
+                    <h4>Declaro estar ciente de que:</h4>
+                    <ul>
+                        <li>O pagamento deve ser realizado da seguinte forma: 50% no ato da contratação e os outros 50% dividido em 5 parcelas equivalentes ou pago no momento da entrega dos documentos.</li>
+                        <li>A cotação em reais será calculada com base no euro do dia.</li>
+                        <li>Em caso de parcelamento no cartão, os juros e encargos são de minha responsabilidade.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Assinaturas -->
+            <div class="signature-section">
+                <div class="signature-field">
+                    <div class="signature-line"></div>
+                    <div class="signature-label">Local / Data</div>
+                </div>
+                <div class="signature-field">
+                    <div class="signature-line"></div>
+                    <div class="signature-label">Assinatura do(a) declarante</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div class="confidential">
+                <span class="lock-icon">🔒</span>
+                Documento de uso interno. Todas as informações serão tratadas com confidencialidade.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

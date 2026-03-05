@@ -97,7 +97,7 @@ function Hero({ dict, locale }: HeroProps) {
             }`}
           >
             <Link
-              href={`/${locale}/contact`}
+              href={`/${locale}/agendamento/booking?service=30min-free`}
               className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-full font-bold text-lg hover:shadow-2xl transition-all hover:scale-105 active:scale-95"
             >
               {dict.hero.cta}

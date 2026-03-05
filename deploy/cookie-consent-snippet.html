@@ -1,0 +1,27 @@
+<!-- NomadWay Cookie Consent Banner -->
+<!-- Add this before closing </body> tag in all pages (pt/index.html, en/index.html, index.html) -->
+
+<script src="/cookie-consent.js"></script>
+
+<!-- Optional: Custom initialization -->
+<script>
+// Listen to consent changes
+window.addEventListener('cookieConsentChanged', function(e) {
+    const consent = e.detail;
+
+    // Example: Load Google Analytics only if consented
+    if (consent.analytics) {
+        // Load your analytics scripts here
+        console.log('Analytics consented');
+    }
+
+    // Example: Load marketing pixels only if consented
+    if (consent.marketing) {
+        // Load marketing scripts here
+        console.log('Marketing consented');
+    }
+});
+
+// Access current consent state
+console.log('Cookie consent:', window.NomadwayCookieConsent.getState());
+</script>

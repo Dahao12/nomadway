@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { FaEnvelope, FaWhatsapp, FaLinkedin, FaInstagram } from 'react-icons/fa'
+import { FaEnvelope, FaLinkedin, FaInstagram } from 'react-icons/fa'
 
 interface FooterProps {
   dict: any
@@ -94,17 +94,6 @@ export default function Footer({ dict, locale }: FooterProps) {
                   className="hover:text-white transition-colors"
                 >
                   {dict.contact.info.email}
-                </a>
-              </li>
-              <li className="flex items-center gap-2 text-sm">
-                <FaWhatsapp className="text-primary-500" />
-                <a
-                  href={`https://wa.me/${dict.contact.info.whatsapp.replace(/\s/g, '')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-white transition-colors"
-                >
-                  {dict.contact.info.whatsapp}
                 </a>
               </li>
               <li className="text-sm">

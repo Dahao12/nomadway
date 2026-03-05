@@ -139,6 +139,16 @@
       "cta": "Iniciar Processo"
     }
   },
+  "additional_services": {
+    "title": "Serviços Adicionais",
+    "items": {
+      "relocation": {
+        "name": "Relocation",
+        "price": "€99",
+        "description": "Consultoria sobre moradia, custos de vida e integração local"
+      }
+    }
+  },
   "contact": {
     "title": "Entre em Contato",
     "subtitle": "Estamos aqui para ajudar você a realizar seu sonho de viver na Espanha",

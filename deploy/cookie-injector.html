@@ -1,0 +1,13 @@
+<!-- NomadWay Cookie Consent Injector -->
+<script>
+(function() {
+    // Carregar cookie-consent.js
+    const script = document.createElement('script');
+    script.src = '/cookie-consent.js';
+    script.async = true;
+    script.onload = function() {
+        console.log('NomadWay Cookie Consent loaded');
+    };
+    document.head.appendChild(script);
+})();
+</script>

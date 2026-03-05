@@ -86,7 +86,7 @@ export default async function ServicesPage({ params }: { params: { lang: string 
                     {params.lang === 'pt' ? 'Requisitos principais:' : 'Main requirements:'}
                   </p>
                   <ul className="space-y-2 text-sm">
-                    <li>• {params.lang === 'pt' ? 'Renda mínima de €2.334/mês (200% do IPREM)' : 'Minimum income of €2,334/month (200% of IPREM)'}</li>
+                    <li>• {params.lang === 'pt' ? 'Renda mínima de €2.368/mês (200% do SMI)' : 'Minimum income of €2,368/month (200% of SMI)'}</li>
                     <li>• {params.lang === 'pt' ? 'Contrato de trabalho remoto ou empresa própria' : 'Remote work contract or own company'}</li>
                     <li>• {params.lang === 'pt' ? 'Seguro de saúde válido na Espanha' : 'Valid health insurance in Spain'}</li>
                     <li>• {params.lang === 'pt' ? 'Comprovante de moradia' : 'Proof of housing'}</li>

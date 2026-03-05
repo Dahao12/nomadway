@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { FaWhatsapp, FaArrowRight } from 'react-icons/fa'
+import { FaWhatsapp, FaArrowRight, FaCalendarAlt } from 'react-icons/fa'
 
 interface CTASectionProps {
   dict: any
@@ -22,10 +22,10 @@ export default function CTASection({ dict, locale }: CTASectionProps) {
             {dict.cta.subtitle}
           </p>
           <Link
-            href={`/${locale}/contact`}
+            href={`/${locale}/agendamento/booking?service=30min-free`}
             className="group inline-flex items-center gap-3 px-8 py-4 bg-white text-primary-600 rounded-full font-semibold hover:bg-gray-50 transition-all shadow-xl hover:shadow-2xl hover:scale-105"
           >
-            <FaWhatsapp size={24} />
+            <FaCalendarAlt size={24} />
             {dict.cta.button}
             <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
           </Link>

@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ficha Cadastral - NomadWay</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    * { font-family: 'Inter', sans-serif; }
+    .section-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+    .section-header {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: white;
+      padding: 1rem 1.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .section-body {
+      padding: 1.5rem;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: 0.375rem;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.625rem 0.875rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      font-size: 0.9375rem;
+      transition: all 0.2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .form-group.required label::after {
+      content: ' *';
+      color: #ef4444;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+    .btn-secondary {
+      background: white;
+      color: #374151;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      border: 1px solid #e5e7eb;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover {
+      background: #f9fafb;
+    }
+    .progress-bar {
+      height: 4px;
+      background: #e5e7eb;
+      border-radius: 2px;
+      margin-bottom: 2rem;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #10b981);
+      transition: width 0.3s ease;
+    }
+    @media print {
+      .no-print { display: none !important; }
+      .section-card { box-shadow: none; border: 1px solid #e5e7eb; page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <!-- Header -->
+  <header class="bg-white shadow-sm sticky top-0 z-50 no-print">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="/logo.png" alt="NomadWay" class="h-8">
+        <span class="text-xl font-bold text-gray-900">Ficha Cadastral</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="saveDraft()" class="btn-secondary flex items-center gap-2">
+          <i class="fas fa-save"></i> Salvar Rascunho
+        </button>
+        <button onclick="generatePDF()" class="btn-primary flex items-center gap-2">
+          <i class="fas fa-file-pdf"></i> Gerar PDF
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Progress -->
+  <div class="max-w-5xl mx-auto px-4 pt-4 no-print">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+    </div>
+    <div class="flex justify-between text-xs text-gray-500 mb-4">
+      <span id="progressText">0% preenchido</span>
+      <span>Campos obrigatórios marcados com *</span>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <main class="max-w-5xl mx-auto px-4 pb-8">
+    <form id="fichaForm">
+      
+      <!-- SECTION 1: DADOS PESSOAIS -->
+      <div class="section-card">
+        <div class="section-header">
+          <i class="fas fa-user"></i>
+          1. Dados Pessoais
+        </div>
+        <div class="section-body">
+          <div class="form-grid">
+            <div class="form-group required">
+              <label>Nome Completo</label>
+              <input type="text" name="nome_completo" required placeholder="Como está no passaporte">
+            </div>
+            <div class="form-group required">
+              <label>Data de Nascimento</label>
+              <input type="date" name="data_nascimento" required>
+            </div>
+            <div class="form-group required">
+              <label>Nacionalidade</label>
+              <select name="nacionalidade" required>
+                <option value="">Selecione...</option>
+                <option value="brasileira" selected>Brasileira</option>
+                <option value="outra">Outra</option>
+              </select>
+            </div>
+            <div class="form-group required">
+              <label>Estado Civil</label>
+              <select name="estado_civil" required>
+                <option value="">Selecione...</option>
+                <option value="solteiro">Solteiro(a)</option>
+                <option value="casado">Casado(a)</option>
+                <option value="divorciado">Divorciado(a)</option>
+                <option value="viuvo">Viúvo(a)</option>
+                <option value="uniao_estavel">União Estável</option>
+              </select>
+            </div>
+            <div class="form-group required">
+              <label>CPF (Brasil)</label>
+              <input type="text" name="cpf" required placeholder="000.000.000-00" maxlength="14">
+            </div>
+            <div class="form-group required">
+              <label>RG (Brasil)</label>
+              <input type="text" name="rg" required placeholder="Número e órgão emissor">
+            </div>
+            <div class="form-group required">
+              <label>Email</label>
+              <input type="email" name="email" required placeholder="seu@email.com">
+            </div>
+            <div class="form-group required">
+              <label>Telefone/WhatsApp</label>
+              <input type="tel" name="telefone" required placeholder="+55 (00) 00000-0000">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: PASSAPORTE -->
+      <div class="section-card">
+        <div class="section-header">
+          <i class="fas fa-passport"></i>
+          2. Passaporte
+        </div>
+        <div class="section-body">
+          <div class="form-grid">
+            <div class="form-group required">
+              <label>Número do Passaporte</label>
+              <input type="text" name="passaporte_numero" required placeholder="AA0000000">
+            </div>
+            <div class="form-group required">
+              <label>Data de Emissão</label>
+              <input type="date" name="passaporte_emissao" required>
+            </div>
+            <div class="form-group required">
+              <label>Data de Validade</label>
+              <input type="date" name="passaporte_validade" required>
+            </div>
+            <div class="form-group required">
+              <label>País de Emissão</label>
+              <input type="text" name="passaporte_pais" required value="Brasil">
+            </div>
+          </div>
+          <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            <strong>Importante:</strong> O passaporte deve ter validade mínima de 12 meses na data da aplicação do visto.
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: ENDEREÇO ATUAL -->
+      <div class="section-card">
+        <div class="section-header">
+          <i class="fas fa-map-marker-alt"></i>
+          3. Endereço Atual
+        </div>
+        <div class="section-body">
+          <div class="form-grid">
+            <div class="form-group required" style="grid-column: span 2;">
+              <label>Endereço Completo</label>
+              <input type="text" name="endereco" required placeholder="Rua, número, complemento">
+            </div>
+            <div class="form-group required">
+              <label>Cidade</label>
+              <input type="text" name="cidade" required>
+            </div>
+            <div class="form-group required">
+              <label>Estado/Província</label>
+              <input type="text" name="estado" required placeholder="Ex: SP, RJ, MG">
+            </div>
+            <div class="form-group required">
+              <label>CEP/Código Postal</label>
+              <input type="text" name="cep" required placeholder="00000-000">
+            </div>
+            <div class="form-group required">
+              <label>País</label>
+              <input type="text" name="pais" required value="Brasil">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 4: DADOS PROFISSIONAIS -->
+      <div class="section-card">
+        <div class="section-header">
+          <i class="fas fa-briefcase"></i>
+          4. Dados Profissionais
+        </div>
+        <div class="section-body">
+          <div class="form-grid">
+            <div class="form-group required">
+              <label>Profissão</label>
+              <input type="text" name="profissao" required placeholder="Ex: Desenvolvedor, Designer, Advogado">
+            </div>
+            <div class="form-group required">
+              <label>Tipo de Trabalho</label>
+              <select name="tipo_trabalho" required>
+                <option value="">Selecione...</option>
+                <option value="freelancer">Freelancer</option>
+                <option value="autonomo">Autônomo</option>
+                <option value="pj">PJ (Pessoa Jurídica)</option>
+                <option value="clt_remoto">CLT Remoto</option>
+                <option value="empresario">Empresário</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Nome da Empresa (se aplicável)</label>
+              <input type="text" name="empresa_nome" placeholder="Razão social">
+            </div>
+            <div class="form-group">
+              <label>CNPJ (se PJ)</label>
+              <input type="text" name="cnpj" placeholder="00.000.000/0000-00">
+            </div>
+            <div class="form-group required">
+              <label>Área de Atuação</label>
+              <select name="area_atuacao" required>
+                <option value="">Selecione...</option>
+                <option value="tecnologia">Tecnologia / TI</option>
+                <option value="design">Design / Criativo</option>
+                <option value="marketing">Marketing / Publicidade</option>
+                <option value="consultoria">Consultoria</option>
+                <option value="financeiro">Financeiro / Contábil</option>
+                <option value="educacao">Educação</option>
+                <option value="saude">Saúde</option>
+                <option value="juridico">Jurídico</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+            <div class="form-group required">
+              <label>Tempo de Experiência na Área</label>
+              <select name="tempo_experiencia" required>
+                <option value="">Selecione...</option>
+                <option value="1-2">1-2 anos</option>
+                <option value="3-5">3-5 anos</option>
+                <option value="5-10">5-10 anos</option>
+                <option value="10+">Mais de 10 anos</option>
+              </select>
+            </div>
+            <div class="form-group required">
+              <label>Renda Mensal Média (EUR)</label>
+              <select name="renda_mensal" required>
+                <option value="">Selecione...</option>
+                <option value="2000-3000">€2.000 - €3.000</option>
+                <option value="3000-5000">€3.000 - €5.000</option>
+                <option value="5000-8000">€5.000 - €8.000</option>
+                <option value="8000-10000">€8.000 - €10.000</option>
+                <option value="10000+">Acima de €10.000</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Link LinkedIn</label>
+              <input type="url" name="linkedin" placeholder="https://linkedin.com/in/seu-perfil">
+            </div>
+            <div class="form-group">
+              <label>Portfolio/Website</label>
+              <input type="url" name="portfolio" placeholder="https://seusite.com">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 5: CLIENTES (trabalho remoto) -->
+      <div class="section-card">
+        <div class="section-header">
+          <i class="fas fa-users"></i>
+          5. Clientes / Fontes de Renda
+        </div>
+        <div class="section-body">
+          <p class="text-sm text-gray-600 mb-4">Para comprovação de renda como trabalhador remoto, informe seus principais clientes ou fontes de renda:</p>
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Cliente 1 - Nome/Empresa</label>
+              <input type="text" name="cliente1_nome" placeholder="Nome do cliente ou empresa">
+            </div>
+            <div class="form-group">
+              <label>Valor Mensal (EUR)</label>
+              <input type="text" name="cliente1_valor" placeholder="€0,00">
+            </div>
+            <div class="form-group">
+              <label>Cliente 2 - Nome/Empresa</label>
+              <input type="text" name="cliente2_nome" placeholder="Nome do cliente ou empresa">
+            </div>
+            <div class="form-group">
+              <label>Valor Mensal (EUR)</label>
+              <input type="text" name="cliente2_valor" placeholder="€0,00">
+            </div>
+            <div class="form-group">
+              <label>Cliente 3 - Nome/Empresa</label>
+              <input type="text" name="cliente3_nome" placeholder="Nome do cliente ou empresa">
+            </div>
+            <div class="form-group">
+              <label>Valor Mensal (EUR)</label>
+              <input type="text" name="cliente3_valor" placeholder="€0,00">
+            </div>
+          </div>
+          
+          <div class="mt-4 form-group">
+            <label>Observações sobre fontes de renda</label>
+            <textarea name="renda_observacoes" rows="2" placeholder="Informações adicionais sobre suas fontes de renda..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 6: VISTO PRETENDIDO -->
+      <div class="section-card">
+        <div class="section-header">
+          <i class="fas fa-plane"></i>
+          6. Visto Pretendido
+        </div>
+        <div class="section-body">
+          <div class="form-grid">
+            <div class="form-group required">
+              <label>Tipo de Visto</label>
+              <select name="tipo_visto" required>
+                <option value="">Selecione...</option>
+                <option value="nomade_digital" selected>Visto de Nômade Digital</option>
+                <option value="lei_beckham">Lei Beckham</option>
+                <option value="estudante">Visto de Estudante</option>
+                <option value="trabalho">Visto de Trabalho</option>
+                <option value="ouro">Visto Ouro (Investidor)</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+            <div class="form-group required">
+              <label>Cidade Pretendida na Espanha</label>
+              <select name="cidade_espanha" required>
+                <option value="">Selecione...</option>
+                <option value="barcelona">Barcelona</option>
+                <option value="madrid">Madrid</option>
+                <option value="valencia">Valência</option>
+                <option value="malaga">Málaga</option>
+                <option value="sevilla">Sevilla</option>
+                <option value="alicante">Alicante</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+            <div class="form-group required">
+              <label>Data Prevista para Mudança</label>
+              <input type="date" name="data_mudanca" required>
+            </div>
+            <div class="form-group">
+              <label>Já possui visto espanhol?</label>
+              <select name="visto_anterior">
+                <option value="nao">Não</option>
+                <option value="sim">Sim</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mt-4 form-group">
+            <label>Obervações sobre o visto pretendido</label>
+            <textarea name="visto_observacoes" rows="2" placeholder="Informações adicionais sobre seus planos..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 7: ACOMPANHANTES -->
+      <div class="section-card">
+        <div class="section-header">
+          <i class="fas fa-users"></i>
+          7. Acompanhantes (Família)
+        </div>
+        <div class="section-body">
+          <p class="text-sm text-gray-600 mb-4">Pessoas que irão com você para a Espanha (cônjuge, filhos, etc.):</p>
+          
+          <div id="acompanhantes-container">
+            <div class="bg-gray-50 p-4 rounded-lg mb-4 acompanhante-item">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Nome Completo</label>
+                  <input type="text" name="acompanhante1_nome" placeholder="Nome do acompanhante">
+                </div>
+                <div class="form-group">
+                  <label>Parentesco</label>
+                  <select name="acompanhante1_parentesco">
+                    <option value="">Selecione...</option>
+                    <option value="conjuge">Cônjuge</option>
+                    <option value="filho">Filho(a)</option>
+                    <option value="pai_mae">Pai/Mãe</option>
+                    <option value="outro">Outro</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Data de Nascimento</label>
+                  <input type="date" name="acompanhante1_nascimento">
+                </div>
+                <div class="form-group">
+                  <label>Passaporte</label>
+                  <input type="text" name="acompanhante1_passaporte" placeholder="Número do passaporte">
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <button type="button" onclick="addAcompanhante()" class="btn-secondary flex items-center gap-2">
+            <i class="fas fa-plus"></i> Adicionar Acompanhante
+          </button>
+        </div>
+      </div>
+
+      <!-- SECTION 8: DOCUMENTOS -->
+      <div class="section-card">
+        <div class="section-header">
+          <i class="fas fa-file-alt"></i>
+          8. Documentos Disponíveis
+        </div>
+        <div class="section-body">
+          <p class="text-sm text-gray-600 mb-4">Marque os documentos que você já possui disponíveis:</p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+              <input type="checkbox" name="doc_passaporte" class="w-5 h-5 text-blue-600">
+              <span>Passaporte válido</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+              <input type="checkbox" name="doc_cpf" class="w-5 h-5 text-blue-600">
+              <span>CPF</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+              <input type="checkbox" name="doc_rg" class="w-5 h-5 text-blue-600">
+              <span>RG</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+              <input type="checkbox" name="doc_certidao_casamento" class="w-5 h-5 text-blue-600">
+              <span>Certidão de Casamento</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+              <input type="checkbox" name="doc_certidao_nascimento" class="w-5 h-5 text-blue-600">
+              <span>Certidão de Nascimento</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+              <input type="checkbox" name="doc_comprovante_renda" class="w-5 h-5 text-blue-600">
+              <span>Comprovante de Renda</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+              <input type="checkbox" name="doc_contrato_trabalho" class="w-5 h-5 text-blue-600">
+              <span>Contrato de Trabalho</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+              <input type="checkbox" name="doc_curriculo" class="w-5 h-5 text-blue-600">
+              <span>Currículo</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+              <input type="checkbox" name="doc_diploma" class="w-5 h-5 text-blue-600">
+              <span>Diploma/Graduação</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+              <input type="checkbox" name="doc_seguro_saude" class="w-5 h-5 text-blue-600">
+              <span>Seguro Saúde Internacional</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+              <input type="checkbox" name="doc_antecedentes_criminais" class="w-5 h-5 text-blue-600">
+              <span>Certidão de Antecedentes Criminais</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+              <input type="checkbox" name="doc_comprovante_endereco" class="w-5 h-5 text-blue-600">
+              <span>Comprovante de Endereço</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 9: OBSERVAÇÕES -->
+      <div class="section-card">
+        <div class="section-header">
+          <i class="fas fa-comment-alt"></i>
+          9. Observações Gerais
+        </div>
+        <div class="section-body">
+          <div class="form-group">
+            <label>Informações adicionais relevantes</label>
+            <textarea name="observacoes" rows="4" placeholder="Qualquer informação adicional que considere importante para seu processo..."></textarea>
+          </div>
+          
+          <div class="mt-4 form-group">
+            <label>Como conheceu a NomadWay?</label>
+            <select name="origem">
+              <option value="">Selecione...</option>
+              <option value="google">Google</option>
+              <option value="instagram">Instagram</option>
+              <option value="facebook">Facebook</option>
+              <option value="linkedin">LinkedIn</option>
+              <option value="indicacao">Indicação de amigo</option>
+              <option value="youtube">YouTube</option>
+              <option value="outro">Outro</option>
+            </select>
+          </div>
+
+          <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <label class="flex items-start gap-3 cursor-pointer">
+              <input type="checkbox" name="aceite_lgpd" required class="w-5 h-5 text-blue-600 mt-0.5">
+              <span class="text-sm text-gray-700">
+                Declaro que as informações fornecidas são verdadeiras e autorizo a NomadWay a utilizar 
+                estes dados para elaboração do contrato e processamento do visto, em conformidade com 
+                a LGPD (Lei Geral de Proteção de Dados).
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUBMIT -->
+      <div class="flex justify-end gap-4 no-print">
+        <button type="button" onclick="clearForm()" class="btn-secondary">
+          <i class="fas fa-eraser mr-2"></i> Limpar
+        </button>
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-paper-plane mr-2"></i> Enviar Ficha
+        </button>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    // Accompaniest counter
+    let acompanhantesCount = 1;
+
+    function addAcompanhante() {
+      acompanhantesCount++;
+      const container = document.getElementById('acompanhantes-container');
+      const newAcompanhante = document.createElement('div');
+      newAcompanhante.className = 'bg-gray-50 p-4 rounded-lg mb-4 acompanhante-item';
+      newAcompanhante.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-sm font-medium text-gray-700">Acompanhante ${acompanhantesCount}</span>
+          <button type="button" onclick="removeAcompanhante(this)" class="text-red-500 hover:text-red-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nome Completo</label>
+            <input type="text" name="acompanhante${acompanhantesCount}_nome" placeholder="Nome do acompanhante">
+          </div>
+          <div class="form-group">
+            <label>Parentesco</label>
+            <select name="acompanhante${acompanhantesCount}_parentesco">
+              <option value="">Selecione...</option>
+              <option value="conjuge">Cônjuge</option>
+              <option value="filho">Filho(a)</option>
+              <option value="pai_mae">Pai/Mãe</option>
+              <option value="outro">Outro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Data de Nascimento</label>
+            <input type="date" name="acompanhante${acompanhantesCount}_nascimento">
+          </div>
+          <div class="form-group">
+            <label>Passaporte</label>
+            <input type="text" name="acompanhante${acompanhantesCount}_passaporte" placeholder="Número do passaporte">
+          </div>
+        </div>
+      `;
+      container.appendChild(newAcompanhante);
+    }
+
+    function removeAcompanhante(btn) {
+      btn.closest('.acompanhante-item').remove();
+    }
+
+    // Progress tracking
+    function updateProgress() {
+      const form = document.getElementById('fichaForm');
+      const requiredFields = form.querySelectorAll('[required]');
+      const filledRequired = Array.from(requiredFields).filter(f => f.value.trim() !== '').length;
+      const progress = Math.round((filledRequired / requiredFields.length) * 100);
+      
+      document.getElementById('progressFill').style.width = progress + '%';
+      document.getElementById('progressText').textContent = progress + '% preenchido';
+    }
+
+    // CPF mask
+    document.querySelector('[name="cpf"]').addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 11) value = value.slice(0, 11);
+      value = value.replace(/(\d{3})(\d)/, '$1.$2');
+      value = value.replace(/(\d{3})(\d)/, '$1.$2');
+      value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+      e.target.value = value;
+    });
+
+    // CEP mask
+    document.querySelector('[name="cep"]').addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 8) value = value.slice(0, 8);
+      value = value.replace(/(\d{5})(\d)/, '$1-$2');
+      e.target.value = value;
+    });
+
+    // Phone mask
+    document.querySelector('[name="telefone"]').addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 13) value = value.slice(0, 13);
+      if (value.startsWith('55')) {
+        value = '+' + value;
+      }
+      e.target.value = value;
+    });
+
+    // Save draft to localStorage
+    function saveDraft() {
+      const form = document.getElementById('fichaForm');
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      localStorage.setItem('nomadway_ficha_draft', JSON.stringify(data));
+      alert('✅ Rascunho salvo com sucesso!');
+    }
+
+    // Load draft from localStorage
+    function loadDraft() {
+      const saved = localStorage.getItem('nomadway_ficha_draft');
+      if (saved) {
+        const data = JSON.parse(saved);
+        const form = document.getElementById('fichaForm');
+        Object.entries(data).forEach(([key, value]) => {
+          const field = form.querySelector(`[name="${key}"]`);
+          if (field) field.value = value;
+        });
+      }
+    }
+
+    // Clear form
+    function clearForm() {
+      if (confirm('Tem certeza que deseja limpar todos os campos?')) {
+        document.getElementById('fichaForm').reset();
+        localStorage.removeItem('nomadway_ficha_draft');
+        updateProgress();
+      }
+    }
+
+    // Generate PDF
+    function generatePDF() {
+      window.print();
+    }
+
+    // Form submission
+    document.getElementById('fichaForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Collect form data
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData.entries());
+      
+      // Create client code
+      const clientCode = 'NW' + new Date().toISOString().slice(5,10).replace('-','') + Math.random().toString(36).substring(2,6).toUpperCase();
+      data.client_code = clientCode;
+      data.created_at = new Date().toISOString();
+      
+      console.log('Ficha cadastral:', data);
+      
+      // TODO: Send to API
+      alert('✅ Ficha cadastrada com sucesso!\n\nCódigo do cliente: ' + clientCode);
+      
+      // Clear draft
+      localStorage.removeItem('nomadway_ficha_draft');
+    });
+
+    // Track progress on input
+    document.getElementById('fichaForm').addEventListener('input', updateProgress);
+    document.getElementById('fichaForm').addEventListener('change', updateProgress);
+
+    // Load draft on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      loadDraft();
+      updateProgress();
+    });
+  </script>
+</body>
+</html>

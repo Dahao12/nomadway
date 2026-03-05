@@ -91,8 +91,15 @@ export default function Header({ dict, locale }: HeaderProps) {
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 group-hover:w-full transition-all duration-300" />
             </Link>
             <Link
+              href={`/${locale}/agendamento/booking?service=30min-free`}
+              className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-full font-semibold hover:from-green-600 hover:to-green-700 transition-all shadow-md hover:shadow-lg hover:scale-105 active:scale-95 flex items-center gap-2"
+            >
+              <span>📅</span>
+              {locale === 'pt' ? 'Agendar' : 'Book Now'}
+            </Link>
+            <Link
               href={`/${locale}/contact`}
-              className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-full font-semibold hover:from-primary-700 hover:to-primary-800 transition-all shadow-md hover:shadow-lg hover:scale-105 active:scale-95"
+              className="px-6 py-3 border-2 border-primary-600 text-primary-600 rounded-full font-semibold hover:bg-primary-600 hover:text-white transition-all"
             >
               {dict.nav.contact}
             </Link>
@@ -107,13 +114,13 @@ export default function Header({ dict, locale }: HeaderProps) {
               <span className="text-sm font-bold uppercase">{otherLocale}</span>
             </Link>
 
-            {/* User Account */}
+            {/* User Account / Client Portal */}
             <Link
-              href={`/${locale}/pricing`}
+              href={`/${locale}/portal`}
               className="flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-primary-600 text-primary-600 font-semibold hover:bg-primary-600 hover:text-white transition-all"
             >
               <FaUser size={16} />
-              <span className="text-sm">{locale === 'pt' ? 'Entrar' : 'Login'}</span>
+              <span className="text-sm">{locale === 'pt' ? 'Área do Cliente' : 'Client Portal'}</span>
             </Link>
           </div>
 
@@ -157,6 +164,14 @@ export default function Header({ dict, locale }: HeaderProps) {
                 {dict.nav.pricing}
               </Link>
               <Link
+                href={`/${locale}/agendamento/booking?service=30min-free`}
+                className="px-4 py-3 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition-all flex items-center gap-2"
+                onClick={toggleMenu}
+              >
+                <span>📅</span>
+                {locale === 'pt' ? 'Agendar Consultoria' : 'Book Consultation'}
+              </Link>
+              <Link
                 href={`/${locale}/contact`}
                 className="px-4 py-3 text-primary-600 hover:bg-primary-50 font-semibold transition-all rounded-lg"
                 onClick={toggleMenu}
@@ -177,11 +192,12 @@ export default function Header({ dict, locale }: HeaderProps) {
 
               <div className="flex gap-3 pt-2">
                 <Link
-                  href={`/${locale}/pricing`}
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg font-semibold hover:from-primary-700 hover:to-primary-800 transition-all text-center"
+                  href={`/${locale}/portal`}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg font-semibold hover:from-primary-700 hover:to-primary-800 transition-all text-center flex items-center justify-center gap-2"
                   onClick={toggleMenu}
                 >
-                  {locale === 'pt' ? 'Entrar' : 'Login'}
+                  <FaUser size={16} />
+                  {locale === 'pt' ? 'Área do Cliente' : 'Client Portal'}
                 </Link>
               </div>
             </div>
