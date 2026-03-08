@@ -5,6 +5,21 @@ import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { FaCalendarAlt, FaClock, FaArrowLeft, FaCheck, FaSpinner, FaUser, FaEnvelope, FaPhone, FaCommentDots } from 'react-icons/fa'
 
+const countryCodes = [
+  { code: '+55', country: 'Brasil', flag: '🇧🇷' },
+  { code: '+34', country: 'Espanha', flag: '🇪🇸' },
+  { code: '+1', country: 'EUA/Canadá', flag: '🇺🇸' },
+  { code: '+351', country: 'Portugal', flag: '🇵🇹' },
+  { code: '+44', country: 'Reino Unido', flag: '🇬🇧' },
+  { code: '+49', country: 'Alemanha', flag: '🇩🇪' },
+  { code: '+33', country: 'França', flag: '🇫🇷' },
+  { code: '+39', country: 'Itália', flag: '🇮🇹' },
+  { code: '+54', country: 'Argentina', flag: '🇦🇷' },
+  { code: '+56', country: 'Chile', flag: '🇨🇱' },
+  { code: '+57', country: 'Colômbia', flag: '🇨🇴' },
+  { code: '+52', country: 'México', flag: '🇲🇽' },
+];
+
 const content = {
   pt: {
     title: 'Agendar Consultoria',
@@ -209,6 +224,7 @@ async function fetchSlots(lang: 'pt' | 'en', serviceId: string): Promise<{ date:
 function BookingContent({ params }: { params: { lang: 'pt' | 'en' } }) {
   const searchParams = useSearchParams()
   const serviceId = searchParams.get('service') || '30min-free'
+  const partnerCode = searchParams.get('ref') || searchParams.get('partner_code') || null
   
   const lang = params.lang || 'pt'
   const t = content[lang]
@@ -222,6 +238,7 @@ function BookingContent({ params }: { params: { lang: 'pt' | 'en' } }) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
+  const [countryCode, setCountryCode] = useState('+55')
   const [notes, setNotes] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
@@ -258,14 +275,12 @@ function BookingContent({ params }: { params: { lang: 'pt' | 'en' } }) {
     if (!name.trim()) newErrors.name = t.errorName
     if (!email.trim()) newErrors.email = t.errorEmail
     
-    // Phone validation - must be international format
+    // Phone validation - must have at least 8 digits after country code
     const phoneDigits = phone.replace(/\D/g, '')
-    if (!phone.trim() || phoneDigits.length < 8) {
+    if (!phone.trim()) {
       newErrors.phone = t.errorPhone
-    } else if (!phone.startsWith('+')) {
-      newErrors.phone = lang === 'pt' ? 'Telefone deve incluir código do país (ex: +55)' : 'Phone must include country code (ex: +34)'
-    } else if (phoneDigits.length < 10 || phoneDigits.length > 15) {
-      newErrors.phone = lang === 'pt' ? 'Número de telefone inválido' : 'Invalid phone number'
+    } else if (phoneDigits.length < 8 || phoneDigits.length > 15) {
+      newErrors.phone = lang === 'pt' ? 'Número inválido (8-15 dígitos)' : 'Invalid number (8-15 digits)'
     }
     
     setErrors(newErrors)
@@ -296,9 +311,11 @@ function BookingContent({ params }: { params: { lang: 'pt' | 'en' } }) {
           time: selectedTime,
           name: name.trim(),
           email: email.trim(),
-          phone: phone.trim(),
+          phone: `${countryCode} ${phone.trim()}`.trim(),
           notes: notes.trim(),
-          lang
+          lang,
+          partner_code: partnerCode,
+          referral_source: partnerCode ? 'partner_link' : undefined
         })
       })
       
@@ -536,6 +553,7 @@ function BookingContent({ params }: { params: { lang: 'pt' | 'en' } }) {
                             className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 ${
                               errors.name ? 'border-red-300 bg-red-50' : 'border-gray-200 focus:border-primary-500'
                             } focus:ring-0 outline-none transition-colors`}
+                            required
                           />
                         </div>
                         {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
@@ -556,6 +574,7 @@ function BookingContent({ params }: { params: { lang: 'pt' | 'en' } }) {
                               className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 ${
                                 errors.email ? 'border-red-300 bg-red-50' : 'border-gray-200 focus:border-primary-500'
                               } focus:ring-0 outline-none transition-colors`}
+                              required
                             />
                           </div>
                           {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
@@ -564,21 +583,37 @@ function BookingContent({ params }: { params: { lang: 'pt' | 'en' } }) {
                           <label className="block text-sm font-medium text-gray-700 mb-2">
                             {t.phoneLabel} <span className="text-red-500">*</span>
                           </label>
-                          <div className="relative">
-                            <FaPhone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                            <input
-                              type="tel"
-                              value={phone}
-                              onChange={(e) => setPhone(formatPhone(e.target.value))}
-                              placeholder={t.phonePlaceholder}
-                              className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 ${
+                          <div className="flex gap-2">
+                            <select
+                              value={countryCode}
+                              onChange={(e) => setCountryCode(e.target.value)}
+                              className={`px-3 py-3 rounded-xl border-2 ${
                                 errors.phone ? 'border-red-300 bg-red-50' : 'border-gray-200 focus:border-primary-500'
-                              } focus:ring-0 outline-none transition-colors`}
-                            />
+                              } focus:ring-0 outline-none transition-colors text-sm`}
+                            >
+                              {countryCodes.map((c) => (
+                                <option key={c.code} value={c.code}>
+                                  {c.flag} {c.code}
+                                </option>
+                              ))}
+                            </select>
+                            <div className="relative flex-1">
+                              <FaPhone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                              <input
+                                type="tel"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value.replace(/[^\d\s()-]/g, ''))}
+                                placeholder={lang === 'pt' ? '11 99999-9999' : '612 345 678'}
+                                className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 ${
+                                  errors.phone ? 'border-red-300 bg-red-50' : 'border-gray-200 focus:border-primary-500'
+                                } focus:ring-0 outline-none transition-colors`}
+                                required
+                              />
+                            </div>
                           </div>
                           {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
                           <p className="text-xs text-gray-500 mt-1">
-                            {lang === 'pt' ? 'Inclua o código do país (ex: +55 11 99999-9999)' : 'Include country code (ex: +34 612 345 678)'}
+                            {lang === 'pt' ? 'Número sem código do país' : 'Number without country code'}
                           </p>
                         </div>
                       </div>

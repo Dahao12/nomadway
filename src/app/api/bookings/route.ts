@@ -1,9 +1,8 @@
 // API Route: Create booking
 import { NextRequest, NextResponse } from 'next/server'
 
-// In-memory store for bookings (in production, use a database)
-// This will reset on each deployment, but works for demo
-const bookings: any[] = []
+// NomadWay Portal Webhook
+const PORTAL_WEBHOOK = 'https://nomadway-portal.vercel.app/api/webhooks/booking'
 
 // Service configurations
 const SERVICES: Record<string, { title: { pt: string; en: string }; duration: number; price: number; currency: string; description?: { pt: string; en: string } }> = {
@@ -56,7 +55,9 @@ export async function POST(request: NextRequest) {
       email, 
       phone, 
       notes,
-      lang = 'pt'
+      lang = 'pt',
+      partner_code,
+      referral_source
     } = body
 
     // Validation
@@ -78,53 +79,66 @@ export async function POST(request: NextRequest) {
       }, { status: 400, headers })
     }
 
-    // Create booking
-    const booking = {
-      id: generateBookingId(),
-      serviceId,
-      service,
-      date,
-      time,
-      timezone: 'Europe/Madrid',
-      customer: {
-        name,
-        email,
-        phone,
-        notes: notes || ''
-      },
-      status: 'confirmed',
-      createdAt: new Date().toISOString(),
-      lang
+    // Create booking ID
+    const bookingId = generateBookingId()
+
+    // Log for debugging
+    console.log('📅 New booking created:')
+    console.log('   ID:', bookingId)
+    console.log('   Customer:', name)
+    console.log('   Email:', email)
+    console.log('   Phone:', phone)
+    console.log('   Service:', service.title[lang as 'pt' | 'en'])
+    console.log('   Date:', date, 'at', time)
+    if (partner_code) {
+      console.log('   Partner Code:', partner_code)
     }
 
-    // Store booking
-    bookings.push(booking)
-
-    // Log for debugging (in production, send email/WhatsApp notification)
-    console.log('📅 New booking created:')
-    console.log('   ID:', booking.id)
-    console.log('   Customer:', booking.customer.name)
-    console.log('   Email:', booking.customer.email)
-    console.log('   Phone:', booking.customer.phone)
-    console.log('   Service:', service.title[lang as 'pt' | 'en'])
-    console.log('   Date:', booking.date, 'at', booking.time)
+    // Send to Portal Webhook (async, don't wait)
+    try {
+      await fetch(PORTAL_WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          booking_code: bookingId,
+          customer_name: name,
+          customer_email: email,
+          customer_phone: phone,
+          customer_notes: notes || '',
+          booking_date: date,
+          booking_time: time,
+          service_id: serviceId,
+          service_name: service.title[lang as 'pt' | 'en'],
+          service_duration: service.duration,
+          price_cents: service.price * 100,
+          source: 'website',
+          language: lang,
+          partner_code: partner_code || null,
+          referral_source: referral_source || null
+        })
+      })
+      console.log('✅ Sent to portal webhook')
+    } catch (webhookError) {
+      // Don't fail if webhook fails
+      console.error('⚠️ Webhook error (non-critical):', webhookError)
+    }
 
     // Response
     return NextResponse.json({
       success: true,
       booking: {
-        id: booking.id,
+        id: bookingId,
         service: service.title[lang as 'pt' | 'en'],
-        date: booking.date,
-        time: booking.time,
+        date: date,
+        time: time,
         timezone: 'Europe/Madrid (GMT+1)',
         duration: service.duration,
         price: service.price === 0 
           ? (lang === 'pt' ? 'Grátis' : 'Free')
           : `${service.price} ${service.currency}`,
         customer: {
-          name: booking.customer.name,
-          email: booking.customer.email
+          name: name,
+          email: email
         }
       },
       message: lang === 'pt'
@@ -139,22 +153,6 @@ export async function POST(request: NextRequest) {
       error: 'Failed to create booking'
     }, { status: 500, headers })
   }
-}
-
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  const admin = searchParams.get('admin')
-  
-  // Simple admin check (in production, use proper auth)
-  if (admin !== 'nomadway2024') {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-  
-  return NextResponse.json({
-    success: true,
-    count: bookings.length,
-    bookings
-  })
 }
 
 export async function OPTIONS() {

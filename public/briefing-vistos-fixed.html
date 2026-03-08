@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Briefing - Reunião Vistos | NomadWay</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    @page {
+      size: A4;
+      margin: 15mm;
+    }
+    * {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      font-size: 11pt;
+      line-height: 1.5;
+    }
+    .page {
+      page-break-after: always;
+      page-break-inside: avoid;
+      height: 267mm;
+      overflow: hidden;
+      position: relative;
+    }
+    .page:last-child {
+      page-break-after: auto;
+    }
+    .no-break {
+      page-break-inside: avoid;
+    }
+  </style>
+</head>
+<body class="bg-white">
+  
+  <!-- PÁGINA 1: CAPA -->
+  <div class="page bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col items-center justify-center p-10">
+    
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <div class="flex flex-col items-center mb-6">
+        <div class="w-28 h-5 bg-red-600 rounded-t-sm"></div>
+        <div class="w-28 h-7 bg-yellow-400 flex items-center justify-center">
+          <div class="w-5 h-5 bg-red-800 rounded-full"></div>
+        </div>
+        <div class="w-28 h-5 bg-red-600 rounded-b-sm"></div>
+      </div>
+      <h1 class="text-5xl font-bold">Nomad<span class="text-yellow-400">Way</span></h1>
+    </div>
+    
+    <!-- Título do Documento -->
+    <div class="border-t-2 border-slate-600 pt-8 mt-4">
+      <p class="text-slate-400 text-sm tracking-widest uppercase mb-3">Documento Confidencial</p>
+      <h2 class="text-4xl font-bold mb-3">Briefing de Reunião</h2>
+      <p class="text-2xl text-yellow-400">Vistos para a Espanha</p>
+    </div>
+    
+    <!-- Info -->
+    <div class="flex items-center gap-10 mt-10 text-sm">
+      <div class="text-center">
+        <p class="text-slate-400 uppercase tracking-wider text-xs mb-1">Data</p>
+        <p class="font-semibold text-lg">27 de Fevereiro, 2026</p>
+      </div>
+      <div class="w-px h-10 bg-slate-600"></div>
+      <div class="text-center">
+        <p class="text-slate-400 uppercase tracking-wider text-xs mb-1">Cliente</p>
+        <p class="font-semibold text-lg">Beatriz</p>
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="absolute bottom-8 text-center">
+      <p class="text-slate-500 text-xs">Validade do orçamento: 7 dias</p>
+    </div>
+    
+  </div>
+
+  <!-- PÁGINA 2: VISTO ESTUDANTE -->
+  <div class="page bg-white p-10">
+    
+    <!-- Header -->
+    <div class="flex items-center gap-4 mb-6 pb-4 border-b-2 border-slate-100">
+      <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
+        <span class="text-white text-lg">📚</span>
+      </div>
+      <div>
+        <p class="text-xs text-slate-500 uppercase tracking-wider">Tipo de Visto #1</p>
+        <h2 class="text-2xl font-bold text-slate-900">Visto de Estudante</h2>
+      </div>
+    </div>
+    
+    <!-- Documentos Obrigatórios -->
+    <div class="bg-slate-50 rounded-xl p-5 mb-5 no-break">
+      <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
+        <span class="w-5 h-5 bg-blue-500 text-white rounded text-xs flex items-center justify-center">✓</span>
+        Documentos Obrigatórios
+      </h3>
+      <div class="grid gap-3">
+        <div class="flex gap-3">
+          <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+          <div>
+            <p class="font-medium text-slate-800">Carta de Aceitação em Curso Oficial</p>
+            <p class="text-sm text-slate-500">FP (Formación Profesional) ou universidade reconhecida</p>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+          <div>
+            <p class="font-medium text-slate-800">Passaporte Válido</p>
+            <p class="text-sm text-slate-500">Com validade suficiente para o período do curso</p>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+          <div>
+            <p class="font-medium text-slate-800">Meios Econômicos Comprovados</p>
+            <p class="text-sm text-slate-500">~600€/mês ou total de 7.200€/ano</p>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+          <div>
+            <p class="font-medium text-slate-800">Seguro Médico Privado</p>
+            <p class="text-sm text-slate-500">Cobertura completa na Espanha</p>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+          <div>
+            <p class="font-medium text-slate-800">Antecedentes Penais</p>
+            <p class="text-sm text-slate-500">Certificado de países onde residiu nos últimos 5 anos</p>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+          <div>
+            <p class="font-medium text-slate-800">Certificado Médico</p>
+            <p class="text-sm text-slate-500">Atestado de saúde recente</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Duração -->
+    <div class="bg-gradient-to-r from-blue-500 to-blue-700 rounded-xl p-5 mb-5 text-white no-break">
+      <h3 class="font-bold mb-2">Duração e Renovação</h3>
+      <p class="text-blue-100 mb-3">Validade total do programa em 2026, seguindo a duração do curso.</p>
+      <div class="bg-white/10 rounded-lg p-3">
+        <p class="text-sm text-blue-100 mb-1">📍 Local de Solicitação</p>
+        <p class="font-medium">Consulado espanhol no país de origem OU diretamente na Espanha</p>
+      </div>
+    </div>
+    
+    <!-- Trabalho -->
+    <div class="bg-green-50 border border-green-200 rounded-xl p-5 mb-5 no-break">
+      <h3 class="font-bold text-green-900 mb-2">💼 Autorização de Trabalho (Novidade 2025)</h3>
+      <p class="text-green-800 mb-2">Desde 2025, o visto de estudante já autoriza até <strong>30h/semana</strong> de trabalho compatível com horários de aula.</p>
+      <p class="text-sm text-green-700">✓ Não requer pedido adicional</p>
+    </div>
+    
+    <!-- Ressalva -->
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-5 no-break">
+      <h3 class="font-bold text-amber-900 mb-2">⚠️ Nacionalidade - Ressalva Importante</h3>
+      <p class="text-amber-800 mb-2">O tempo de estudo e trabalho <strong>NÃO contabiliza</strong> para nacionalidade espanhola.</p>
+      <p class="text-sm text-amber-700">Exceção: Quando a empresa troca para <strong>Visto de Trabalho</strong>, aí começa a contagem.</p>
+    </div>
+    
+  </div>
+
+  <!-- PÁGINA 3: VISTO NÔMADE -->
+  <div class="page bg-white p-10">
+    
+    <!-- Header -->
+    <div class="flex items-center gap-4 mb-6 pb-4 border-b-2 border-slate-100">
+      <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg flex items-center justify-center flex-shrink-0">
+        <span class="text-white text-lg">🌍</span>
+      </div>
+      <div>
+        <p class="text-xs text-slate-500 uppercase tracking-wider">Tipo de Visto #2</p>
+        <h2 class="text-2xl font-bold text-slate-900">Visto Nômade Digital</h2>
+      </div>
+    </div>
+    
+    <!-- Requisitos -->
+    <div class="bg-slate-50 rounded-xl p-5 mb-5 no-break">
+      <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
+        <span class="w-5 h-5 bg-purple-500 text-white rounded text-xs flex items-center justify-center">✓</span>
+        Requisitos para Não-UE
+      </h3>
+      <div class="grid gap-3">
+        <div class="flex gap-3">
+          <div class="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+          <div>
+            <p class="font-medium text-slate-800">Trabalho Remoto</p>
+            <p class="text-sm text-slate-500">≥80% da renda de empresas/fora da Espanha</p>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <div class="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+          <div>
+            <p class="font-medium text-slate-800">Qualificação Profissional</p>
+            <p class="text-sm text-slate-500">Graduação OU 3 anos de experiência comprovada</p>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <div class="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+          <div>
+            <p class="font-medium text-slate-800">Renda Mínima</p>
+            <p class="text-sm text-slate-500">2.850€/mês (ou equivalente em moeda estrangeira)</p>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <div class="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+          <div>
+            <p class="font-medium text-slate-800">Seguro Privado</p>
+            <p class="text-sm text-slate-500">Cobertura médica completa</p>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <div class="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+          <div>
+            <p class="font-medium text-slate-800">Antecedentes Penais</p>
+            <p class="text-sm text-slate-500">Certificado de países de residência</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Duração -->
+    <div class="grid grid-cols-2 gap-4 mb-5 no-break">
+      <div class="bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl p-5 text-white text-center">
+        <p class="text-purple-200 text-sm mb-1">Via Consulado</p>
+        <p class="text-4xl font-bold">1 Ano</p>
+        <p class="text-purple-200 text-sm mt-1">Inicial, renovável</p>
+      </div>
+      <div class="bg-gradient-to-br from-purple-600 to-purple-800 rounded-xl p-5 text-white text-center">
+        <p class="text-purple-200 text-sm mb-1">Na Espanha</p>
+        <p class="text-4xl font-bold">Até 3 Anos</p>
+        <p class="text-purple-200 text-sm mt-1">Período máximo</p>
+      </div>
+    </div>
+    
+    <!-- Brechas -->
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-5 no-break">
+      <h3 class="font-bold text-blue-900 mb-3">💡 Brechas na Lei - Oportunidades</h3>
+      <p class="text-blue-800 mb-3">Existem brechas que facilitam trabalhar como prestador de serviços e estudar na Espanha com equivalência de cidadão espanhol:</p>
+      <div class="bg-white rounded-lg p-3">
+        <p class="font-medium text-blue-900">Cursos FP (Formación Profesional)</p>
+        <p class="text-sm text-blue-700 mt-1">Equivalente a tecnólogo no Brasil, com duração de 1 a 2 anos, reconhecidos pelo Governo Espanhol (RUCT).</p>
+      </div>
+    </div>
+    
+    <!-- Dica -->
+    <div class="bg-slate-100 rounded-xl p-4 no-break">
+      <p class="text-slate-600 text-sm">📌 <strong>Dica:</strong> O visto nômade digital é ideal para profissionais remotos que desejam viver na Espanha sem vínculo empregatício local.</p>
+    </div>
+    
+  </div>
+
+  <!-- PÁGINA 4: INVESTIMENTO -->
+  <div class="page bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col items-center justify-center p-10">
+    
+    <!-- Header -->
+    <div class="text-center mb-10">
+      <p class="text-yellow-400 text-sm tracking-widest uppercase mb-2">Investimento</p>
+      <h2 class="text-4xl font-bold">Mentoria NomadWay</h2>
+      <p class="text-slate-400 mt-2">Acompanhamento completo para seu visto</p>
+    </div>
+    
+    <!-- Preço -->
+    <div class="bg-white rounded-2xl p-8 mb-8 w-full max-w-md text-center">
+      <p class="text-slate-500 text-sm uppercase tracking-wider mb-2">Valor Total</p>
+      <div class="flex items-baseline justify-center gap-2 mb-6">
+        <span class="text-6xl font-bold text-slate-900">1.300</span>
+        <span class="text-2xl text-slate-600">Euros</span>
+      </div>
+      
+      <!-- Pagamento -->
+      <div class="border-t border-slate-200 pt-6">
+        <h3 class="font-semibold text-slate-900 mb-4">Forma de Pagamento</h3>
+        
+        <div class="space-y-3">
+          <div class="flex items-center gap-4 bg-green-50 rounded-lg p-4">
+            <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-lg">50%</div>
+            <div class="flex-1 text-left">
+              <p class="font-medium text-slate-900">Entrada</p>
+              <p class="text-sm text-slate-500">650 Euros</p>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-4 bg-blue-50 rounded-lg p-4">
+            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg">50%</div>
+            <div class="flex-1 text-left">
+              <p class="font-medium text-slate-900">Segunda Parcela</p>
+              <p class="text-sm text-slate-500">650 Euros</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Validade -->
+    <div class="bg-yellow-400/20 border border-yellow-400/50 rounded-xl p-5 text-center mb-8">
+      <div class="flex items-center justify-center gap-3 mb-1">
+        <span class="text-yellow-400 text-xl">⏱</span>
+        <p class="text-yellow-400 font-semibold">Validade do Orçamento</p>
+      </div>
+      <p class="text-white text-3xl font-bold">7 dias</p>
+    </div>
+    
+    <!-- Contato -->
+    <div class="text-center text-sm">
+      <p class="text-slate-400 mb-3">Dúvidas? Entre em contato:</p>
+      <div class="flex items-center justify-center gap-6">
+        <p class="text-slate-300">📱 +34 612 45 59 82</p>
+        <p class="text-slate-300">🌐 nomadway.com.br</p>
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="mt-10 text-center">
+      <div class="flex items-center justify-center gap-2 mb-3">
+        <div class="w-6 h-1 bg-red-600 rounded"></div>
+        <div class="w-6 h-4 bg-yellow-400 rounded-sm"></div>
+        <div class="w-6 h-1 bg-red-600 rounded"></div>
+      </div>
+      <p class="text-slate-500 text-xs">NomadWay © 2026 - Consultoria para Nômades Digitais</p>
+    </div>
+    
+  </div>
+
+</body>
+</html>
