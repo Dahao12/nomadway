@@ -63,8 +63,8 @@ const services = {
       location: 'Online/Presencial',
       price: '€99',
       isFree: false,
-      description: 'Serviço de relocation - busca de moradia, abertura de conta, etc.',
-      features: ['Busca de moradia', 'Abertura de conta bancária', 'Cadastro em serviços', 'Orientação local'],
+      description: 'Consultoria de relocation - €99 pela sessão. Serviços adicionais conforme necessidade.',
+      features: ['Consulta inicial de 60min', 'Orientação sobre moradia', 'Dicas de integração local', 'Network de contatos'],
       popular: false
     },
     {
@@ -163,8 +163,8 @@ const services = {
       location: 'Online/In-person',
       price: '€99',
       isFree: false,
-      description: 'Relocation service - housing search, bank account opening, etc.',
-      features: ['Housing search', 'Bank account opening', 'Service registration', 'Local orientation'],
+      description: 'Relocation consulting - €99 for the session. Additional services as needed.',
+      features: ['Initial 60min consultation', 'Housing guidance', 'Local integration tips', 'Contact network'],
       popular: false
     },
     {

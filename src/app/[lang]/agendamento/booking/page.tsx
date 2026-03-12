@@ -107,7 +107,7 @@ const services = {
     'mentoria': { title: 'Mentoria Diagnóstico', duration: '60 min', icon: '📊', free: false, price: '€99', description: 'Sessão de diagnóstico - valor descontado do Nomad Visa' },
     'nomad-visa': { title: 'Nomad Visa Completo', duration: '90 min', icon: '✈️', free: false, price: '€1.499', description: 'Processo completo com acompanhamento total' },
     'nomad-visa-dependent': { title: 'Dependente Adicional', duration: '60 min', icon: '👨‍👩‍👧', free: false, price: '+€299', description: 'Adicionar dependente ao processo' },
-    'relocation': { title: 'Relocation', duration: '60 min', icon: '🏠', free: false, price: '€99', description: 'Consultoria sobre moradia e integração local' },
+    'relocation': { title: 'Relocation', duration: '60 min', icon: '🏠', free: false, price: '€99', description: 'Consultoria de relocation - sessão de 60min' },
     'vip-inperson': { title: 'VIP Presencial', duration: '120 min', icon: '⭐', free: false, price: '€3.000', description: 'Consultoria VIP em Barcelona' },
     'estancia-estudos': { title: 'Vistos para Estância de Estudos', duration: '90 min', icon: '🎓', free: false, price: '€1.499', description: 'Processo completo de visto de estudante' },
     '30min-followup': { title: 'Acompanhamento', duration: '30 min', icon: '🔄', free: true, price: 'Cliente', clientOnly: true, description: 'Para clientes que já contrataram' }
@@ -117,7 +117,7 @@ const services = {
     'mentoria': { title: 'Diagnostic Mentoring', duration: '60 min', icon: '📊', free: false, price: '€99', description: 'Diagnostic session - discounted from Nomad Visa' },
     'nomad-visa': { title: 'Nomad Visa Complete', duration: '90 min', icon: '✈️', free: false, price: '€1,499', description: 'Complete process with full support' },
     'nomad-visa-dependent': { title: 'Additional Dependent', duration: '60 min', icon: '👨‍👩‍👧', free: false, price: '+€299', description: 'Add dependent to process' },
-    'relocation': { title: 'Relocation', duration: '60 min', icon: '🏠', free: false, price: '€99', description: 'Consulting on housing and local integration' },
+    'relocation': { title: 'Relocation', duration: '60 min', icon: '🏠', free: false, price: '€99', description: 'Relocation consulting - 60min session' },
     'vip-inperson': { title: 'VIP In-Person', duration: '120 min', icon: '⭐', free: false, price: '€3,000', description: 'VIP consultation in Barcelona' },
     'estancia-estudos': { title: 'Student Residence Visa', duration: '90 min', icon: '🎓', free: false, price: '€1,499', description: 'Complete student visa process' },
     '30min-followup': { title: 'Follow-up Session', duration: '30 min', icon: '🔄', free: true, price: 'Client', clientOnly: true, description: 'For existing clients' }
