@@ -39,20 +39,8 @@ const services = {
       location: 'Online + Presencial',
       price: '€1.499',
       isFree: false,
-      description: 'Processo completo de visto nômade digital com acompanhamento total.',
-      features: ['Análise completa', 'Montagem de documentos', 'Submissão da aplicação', 'Acompanhamento até aprovação'],
-      popular: false
-    },
-    {
-      id: 'nomad-visa-dependent',
-      icon: '👨‍👩‍👧',
-      title: 'Dependente Adicional',
-      duration: 'Por pessoa',
-      location: 'Online',
-      price: '+€299',
-      isFree: false,
-      description: 'Adicionar dependente ao processo Nomad Visa.',
-      features: ['Documentação do dependente', 'Inclusão na aplicação', 'Acompanhamento'],
+      description: 'Processo completo de visto nômade digital com acompanhamento total. Dependentes: +€299 cada.',
+      features: ['Análise completa', 'Montagem de documentos', 'Submissão da aplicação', 'Acompanhamento até aprovação', 'Dependentes: +€299/pessoa'],
       popular: false
     },
     {
@@ -139,20 +127,8 @@ const services = {
       location: 'Online + In-person',
       price: '€1,499',
       isFree: false,
-      description: 'Complete digital nomad visa process with full support.',
-      features: ['Complete analysis', 'Document preparation', 'Application submission', 'Support until approval'],
-      popular: false
-    },
-    {
-      id: 'nomad-visa-dependent',
-      icon: '👨‍👩‍👧',
-      title: 'Additional Dependent',
-      duration: 'Per person',
-      location: 'Online',
-      price: '+€299',
-      isFree: false,
-      description: 'Add dependent to Nomad Visa process.',
-      features: ['Dependent documentation', 'Application inclusion', 'Support'],
+      description: 'Complete digital nomad visa process with full support. Dependents: +€299 each.',
+      features: ['Complete analysis', 'Document preparation', 'Application submission', 'Support until approval', 'Dependents: +€299/person'],
       popular: false
     },
     {

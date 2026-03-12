@@ -105,8 +105,7 @@ const services = {
   pt: {
     '30min-free': { title: 'Consulta Gratuita', duration: '30 min', icon: '🎯', free: true, price: 'GRÁTIS', description: 'Avaliação gratuita do seu caso de visto' },
     'mentoria': { title: 'Mentoria Diagnóstico', duration: '60 min', icon: '📊', free: false, price: '€99', description: 'Sessão de diagnóstico - valor descontado do Nomad Visa' },
-    'nomad-visa': { title: 'Nomad Visa Completo', duration: '90 min', icon: '✈️', free: false, price: '€1.499', description: 'Processo completo com acompanhamento total' },
-    'nomad-visa-dependent': { title: 'Dependente Adicional', duration: '60 min', icon: '👨‍👩‍👧', free: false, price: '+€299', description: 'Adicionar dependente ao processo' },
+    'nomad-visa': { title: 'Nomad Visa Completo', duration: '90 min', icon: '✈️', free: false, price: '€1.499', description: 'Processo completo com acompanhamento total (Dependentes: +€299)' },
     'relocation': { title: 'Relocation', duration: '60 min', icon: '🏠', free: false, price: '€99', description: 'Consultoria de relocation - sessão de 60min' },
     'vip-inperson': { title: 'VIP Presencial', duration: '120 min', icon: '⭐', free: false, price: '€3.000', description: 'Consultoria VIP em Barcelona' },
     'estancia-estudos': { title: 'Vistos para Estância de Estudos', duration: '90 min', icon: '🎓', free: false, price: '€1.499', description: 'Processo completo de visto de estudante' },
@@ -115,8 +114,7 @@ const services = {
   en: {
     '30min-free': { title: 'Free Consultation', duration: '30 min', icon: '🎯', free: true, price: 'FREE', description: 'Free assessment of your visa case' },
     'mentoria': { title: 'Diagnostic Mentoring', duration: '60 min', icon: '📊', free: false, price: '€99', description: 'Diagnostic session - discounted from Nomad Visa' },
-    'nomad-visa': { title: 'Nomad Visa Complete', duration: '90 min', icon: '✈️', free: false, price: '€1,499', description: 'Complete process with full support' },
-    'nomad-visa-dependent': { title: 'Additional Dependent', duration: '60 min', icon: '👨‍👩‍👧', free: false, price: '+€299', description: 'Add dependent to process' },
+    'nomad-visa': { title: 'Nomad Visa Complete', duration: '90 min', icon: '✈️', free: false, price: '€1,499', description: 'Complete process with full support (Dependents: +€299)' },
     'relocation': { title: 'Relocation', duration: '60 min', icon: '🏠', free: false, price: '€99', description: 'Relocation consulting - 60min session' },
     'vip-inperson': { title: 'VIP In-Person', duration: '120 min', icon: '⭐', free: false, price: '€3,000', description: 'VIP consultation in Barcelona' },
     'estancia-estudos': { title: 'Student Residence Visa', duration: '90 min', icon: '🎓', free: false, price: '€1,499', description: 'Complete student visa process' },
