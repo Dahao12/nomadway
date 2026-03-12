@@ -30,6 +30,13 @@ const SERVICES: Record<string, { title: { pt: string; en: string }; duration: nu
     duration: 90,
     price: 3000,
     currency: 'EUR'
+  },
+  'estancia-estudos': {
+    title: { pt: 'Vistos para Estância de Estudos', en: 'Student Residence Visa' },
+    duration: 60,
+    price: 1499,
+    currency: 'EUR',
+    description: { pt: 'Processo completo de visto de estudante', en: 'Complete student visa process' }
   }
 }
 

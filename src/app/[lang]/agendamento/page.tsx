@@ -49,7 +49,7 @@ const services = {
       title: 'Dependente Adicional',
       duration: 'Por pessoa',
       location: 'Online',
-      price: '+€279',
+      price: '+€299',
       isFree: false,
       description: 'Adicionar dependente ao processo Nomad Visa.',
       features: ['Documentação do dependente', 'Inclusão na aplicação', 'Acompanhamento'],
@@ -77,6 +77,18 @@ const services = {
       isFree: false,
       description: 'Consultoria VIP presencial em Barcelona com atendimento exclusivo.',
       features: ['Presencial em Barcelona', 'Análise completa', 'Acompanhamento VIP', 'Networking local'],
+      popular: false
+    },
+    {
+      id: 'estancia-estudos',
+      icon: '🎓',
+      title: 'Vistos para Estância de Estudos',
+      duration: 'Processo completo',
+      location: 'Online + Presencial',
+      price: '€1.499',
+      isFree: false,
+      description: 'Processo completo de visto de estudante para a Espanha.',
+      features: ['Análise de elegibilidade', 'Documentação completa', 'Matrícula em instituição', 'Acompanhamento até aprovação'],
       popular: false
     },
     {
@@ -137,7 +149,7 @@ const services = {
       title: 'Additional Dependent',
       duration: 'Per person',
       location: 'Online',
-      price: '+€279',
+      price: '+€299',
       isFree: false,
       description: 'Add dependent to Nomad Visa process.',
       features: ['Dependent documentation', 'Application inclusion', 'Support'],
@@ -165,6 +177,18 @@ const services = {
       isFree: false,
       description: 'VIP in-person consultation in Barcelona with exclusive service.',
       features: ['In-person in Barcelona', 'Complete analysis', 'VIP support', 'Local networking'],
+      popular: false
+    },
+    {
+      id: 'estancia-estudos',
+      icon: '🎓',
+      title: 'Student Residence Visa',
+      duration: 'Full process',
+      location: 'Online + In-person',
+      price: '€1,499',
+      isFree: false,
+      description: 'Complete student visa process for Spain.',
+      features: ['Eligibility analysis', 'Complete documentation', 'Institution enrollment', 'Support until approval'],
       popular: false
     },
     {
