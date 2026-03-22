@@ -71,6 +71,13 @@ const navItems = [
     roles: ['super_admin', 'admin']
   },
   { 
+    href: '/admin/statement', 
+    label: 'Extrato', 
+    icon: '📄',
+    description: 'Extratos financeiros',
+    roles: ['super_admin', 'admin']
+  },
+  { 
     href: '/admin/settings', 
     label: 'Configurações', 
     icon: '⚙️',
