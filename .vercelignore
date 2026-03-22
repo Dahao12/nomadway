@@ -1,0 +1,53 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Testing
+coverage
+
+# Next.js
+.next/
+out/
+build
+dist
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files
+.env
+.env*.local
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Database
+*.db
+*.sql
+supabase/migrations/
+
+# Logs
+logs
+*.log
+
+# Temp files
+tmp
+temp
+*.tmp
+
+# Assets and backups (not needed for deploy)
+nomadway-assets
+nomadway-invoices
+alpha-invest-pdf
+deployment-snapshots
