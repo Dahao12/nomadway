@@ -1,0 +1,155 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* Background and Foreground */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    /* Card */
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    /* Popover */
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    /* Primary - NomadWay Blue */
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 210 40% 98%;
+
+    /* Secondary - NomadWay Purple */
+    --secondary: 293 69% 49%;
+    --secondary-foreground: 210 40% 98%;
+
+    /* Muted */
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    /* Accent */
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    /* Destructive */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Border, Input, Ring */
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 217.2 91.2% 59.8%;
+
+    /* Radius */
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 293 69% 49%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* NomadWay Custom Styles */
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #f3f4f6;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #9ca3af;
+}
+
+/* Status badge colors */
+.status-pending {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.status-in_progress {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+
+.status-awaiting_client {
+  background-color: #fefce8;
+  color: #a16207;
+}
+
+.status-in_review {
+  background-color: #fdf4ff;
+  color: #a21caf;
+}
+
+.status-blocked {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+.status-completed {
+  background-color: #f0fdf4;
+  color: #16a34a;
+}
+
+/* Timeline dot colors */
+.timeline-dot-pending {
+  background-color: #d1d5db;
+}
+
+.timeline-dot-in_progress {
+  background-color: #3b82f6;
+}
+
+.timeline-dot-awaiting_client {
+  background-color: #eab308;
+}
+
+.timeline-dot-in_review {
+  background-color: #d946ef;
+}
+
+.timeline-dot-blocked {
+  background-color: #ef4444;
+}
+
+.timeline-dot-completed {
+  background-color: #22c55e;
+}
