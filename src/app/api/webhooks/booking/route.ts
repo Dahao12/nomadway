@@ -280,12 +280,79 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Block Wednesdays (day 3 in JS)
+    const bookingDate = new Date(booking_date + 'T00:00:00');
+    if (bookingDate.getDay() === 3) {
+      return NextResponse.json(
+        {
+          error: 'Dia não disponível',
+          details: 'Quartas-feiras não estão disponíveis para agendamento. Por favor, escolha outra data.',
+          weekday: 'Wednesday'
+        },
+        { status: 400 }
+      );
+    }
+
+    // Validate booking limits
+    const supabase = createServerClient();
+
+    // Check maximum 5 bookings per day
+    const { data: existingDayBookings, error: dayError } = await supabase
+      .from('bookings')
+      .select('*')
+      .eq('booking_date', booking_date)
+      .in('status', ['pending', 'confirmed']);
+
+    if (!dayError && existingDayBookings && existingDayBookings.length >= 5) {
+      return NextResponse.json(
+        {
+          error: 'Limite diário de agendamentos atingido',
+          details: 'Já existem 5 agendamentos para esta data. Por favor, escolha outra data.',
+          count: existingDayBookings.length
+        },
+        { status: 400 }
+      );
+    }
+
+    // Check minimum 2.5 hours interval between bookings
+    const { data: allDayBookings, error: intervalError } = await supabase
+      .from('bookings')
+      .select('*')
+      .eq('booking_date', booking_date)
+      .in('status', ['pending', 'confirmed'])
+      .order('booking_time', { ascending: true });
+
+    if (!intervalError && allDayBookings && allDayBookings.length > 0) {
+      const newTimeMinutes = parseInt(booking_time.substring(0, 2)) * 60 + parseInt(booking_time.substring(3, 5));
+      const minIntervalMinutes = 2.5 * 60; // 2.5 hours in minutes
+
+      for (const existing of allDayBookings) {
+        const existingTimeMinutes = parseInt(existing.booking_time?.substring(0, 2) || '0') * 60 +
+                                     parseInt(existing.booking_time?.substring(3, 5) || '0');
+
+        const timeDiff = Math.abs(newTimeMinutes - existingTimeMinutes);
+
+        if (timeDiff < minIntervalMinutes) {
+          // Calculate how many minutes away
+          const minDiff = Math.round(minIntervalMinutes - timeDiff);
+
+          return NextResponse.json(
+            {
+              error: 'Intervalo mínimo entre agendamentos não respeitado',
+              details: `Os agendamentos devem ter pelo menos 2.5 horas de intervalo. Horário conflitante: ${existing.booking_time}. Escolha um horário com mais ${minDiff} minutos de diferença.`,
+              conflictTime: existing.booking_time,
+              minDiff: minDiff
+            },
+            { status: 400 }
+          );
+        }
+      }
+    }
+
     // Generate booking code
-    const booking_code = 'NW' + 
+    const booking_code = 'NW' +
       new Date().toISOString().slice(5, 10).replace('-', '') +
       Math.random().toString(36).substring(2, 6).toUpperCase();
-
-    const supabase = createServerClient();
 
     // Create booking in Supabase
     const { data: booking, error } = await supabase

@@ -87,6 +87,7 @@ export default function BookingsPage() {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all');
 
   useEffect(() => {
     fetchBookings();
@@ -102,7 +103,13 @@ export default function BookingsPage() {
         ...b,
         formData: parseNotes(b.customer_notes || b.notes)
       }));
-      setBookings(bookingsWithFormData);
+      // Sort by date (ascending) then by time (ascending) - oldest first
+      const sortedBookings = bookingsWithFormData.sort((a: Booking, b: Booking) => {
+        const dateCompare = a.booking_date.localeCompare(b.booking_date);
+        if (dateCompare !== 0) return dateCompare;
+        return a.booking_time.localeCompare(b.booking_time);
+      });
+      setBookings(sortedBookings);
     } catch (error) {
       console.error('Error fetching bookings:', error);
     }
@@ -186,11 +193,37 @@ export default function BookingsPage() {
 
   const filteredBookings = bookings.filter(b => {
     const matchesStatus = statusFilter === 'all' || b.status === statusFilter;
-    const matchesSearch = !search || 
+    const matchesSearch = !search ||
       b.customer_name?.toLowerCase().includes(search.toLowerCase()) ||
       b.customer_email?.toLowerCase().includes(search.toLowerCase()) ||
       b.booking_code?.toLowerCase().includes(search.toLowerCase());
-    return matchesStatus && matchesSearch;
+
+    // Date filter
+    let matchesDateFilter = true;
+    if (dateFilter !== 'all') {
+      const bookingDate = new Date(b.booking_date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay());
+
+      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+      if (dateFilter === 'today') {
+        matchesDateFilter = bookingDate.getTime() === today.getTime();
+      } else if (dateFilter === 'week') {
+        matchesDateFilter = bookingDate >= startOfWeek;
+      } else if (dateFilter === 'month') {
+        matchesDateFilter = bookingDate >= startOfMonth;
+      } else if (dateFilter === 'upcoming') {
+        matchesDateFilter = bookingDate > today;
+      } else if (dateFilter === 'past') {
+        matchesDateFilter = bookingDate < today;
+      }
+    }
+
+    return matchesStatus && matchesSearch && matchesDateFilter;
   });
 
   const selectedDateBookings = selectedDate ? getBookingsForDate(selectedDate) : [];
@@ -417,6 +450,18 @@ export default function BookingsPage() {
                   className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+              <select
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className="px-4 py-2 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">📅 Todas as datas</option>
+                <option value="today">📅 Hoje</option>
+                <option value="week">📅 Esta semana</option>
+                <option value="month">📅 Este mês</option>
+                <option value="upcoming">📅 Futuros</option>
+                <option value="past">📅 Passados</option>
+              </select>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
