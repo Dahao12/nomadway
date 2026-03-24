@@ -140,8 +140,9 @@ export default function SchedulePage() {
   async function fetchData() {
     setLoading(true);
     try {
+      // Fetch all bookings (no date filter) to allow viewing future dates
       const [bookingsRes, blocksRes] = await Promise.all([
-        fetch(`/api/admin/bookings?date=${new Date().toISOString().split('T')[0]}`),
+        fetch('/api/admin/bookings'),
         fetch('/api/admin/blocks')
       ]);
 
