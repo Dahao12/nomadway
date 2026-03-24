@@ -29,10 +29,10 @@ const navItems = [
     roles: ['super_admin', 'admin', 'operacional', 'viewer']
   },
   { 
-    href: '/admin/bookings', 
+    href: '/admin/schedule', 
     label: 'Agendamentos', 
     icon: '📅',
-    description: 'Calendário',
+    description: 'Calendário Interativo',
     roles: ['super_admin', 'admin', 'operacional', 'viewer']
   },
   { 
