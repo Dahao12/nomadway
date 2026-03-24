@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -38,12 +38,22 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 const TIME_SLOTS = [
+  '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+  '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
   '15:00', '15:30', '16:00', '16:30', '17:00', '17:30',
   '18:00', '18:30', '19:00', '19:30', '20:00', '20:30',
   '21:00', '21:30', '22:00', '22:30', '23:00', '23:30'
 ];
 
-// Portuguese month names
+// Quick block presets
+const QUICK_BLOCKS = [
+  { label: '🌞 Almoço', startTime: '12:00', endTime: '14:00', reason: 'Almoço' },
+  { label: '📅 Feriado', reason: 'Feriado', fullDay: true },
+  { label: '🏖️ Férias', reason: 'Férias', fullDay: true },
+  { label: '🚫 Folga', reason: 'Folga', fullDay: true },
+  { label: '📞 Reunião', startTime: '10:00', endTime: '12:00', reason: 'Reunião' },
+];
+
 const MONTHS = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
@@ -56,14 +66,26 @@ export default function SchedulePage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [blockedSlots, setBlockedSlots] = useState<BlockedSlot[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   
   // Calendar state
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   
+  // Multi-select for dragging
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState<string | null>(null);
+  const [dragEnd, setDragEnd] = useState<string | null>(null);
+  const [selectedSlots, setSelectedSlots] = useState<Set<string>>(new Set());
+  
+  // Time slot multi-select
+  const [timeDragStart, setTimeDragStart] = useState<string | null>(null);
+  const [selectedTimes, setSelectedTimes] = useState<Set<string>>(new Set());
+  
   // Modal states
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [showQuickActions, setShowQuickActions] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [blockForm, setBlockForm] = useState({
     startDate: '',
@@ -72,6 +94,9 @@ export default function SchedulePage() {
     endTime: '',
     reason: ''
   });
+  
+  // Toast notification
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
     checkAuth();
@@ -82,6 +107,18 @@ export default function SchedulePage() {
       fetchData();
     }
   }, [selectedDate]);
+
+  // Auto-dismiss toast
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
+  function showToast(message: string, type: 'success' | 'error' = 'success') {
+    setToast({ message, type });
+  }
 
   function checkAuth() {
     fetch('/api/auth/check')
@@ -119,6 +156,11 @@ export default function SchedulePage() {
     setLoading(false);
   }
 
+  // Date string helper
+  function dateStr(date: Date) {
+    return date.toISOString().split('T')[0];
+  }
+
   // Calendar helpers
   function getDaysInMonth(date: Date) {
     const year = date.getFullYear();
@@ -127,13 +169,11 @@ export default function SchedulePage() {
     const lastDay = new Date(year, month + 1, 0);
     const days = [];
     
-    // Add empty cells for days before first of month
     const startPadding = firstDay.getDay();
     for (let i = 0; i < startPadding; i++) {
       days.push(null);
     }
     
-    // Add days of month
     for (let day = 1; day <= lastDay.getDate(); day++) {
       days.push(new Date(year, month, day));
     }
@@ -151,13 +191,211 @@ export default function SchedulePage() {
     );
   }
 
+  function isTimeSlotBlocked(date: string, time: string) {
+    return blockedSlots.some(block =>
+      date >= block.start_date && date <= block.end_date &&
+      block.start_time && block.end_time &&
+      time >= block.start_time && time <= block.end_time
+    );
+  }
+
   function formatPrice(cents: number) {
     return `€${(cents / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
   }
 
-  // Block slot handlers
+  // ===== INTERACTIVE BLOCKING =====
+
+  // Quick block - predefined actions
+  async function handleQuickBlock(preset: typeof QUICK_BLOCKS[0]) {
+    if (!selectedDate) return;
+
+    setSaving(true);
+    try {
+      let startTime = preset.startTime || null;
+      let endTime = preset.endTime || null;
+      
+      // If time slots are selected, use them instead
+      if (selectedTimes.size > 0) {
+        const sortedTimes = TIME_SLOTS.filter(t => selectedTimes.has(t));
+        startTime = sortedTimes[0];
+        endTime = sortedTimes[sortedTimes.length - 1];
+      }
+
+      const res = await fetch('/api/admin/blocks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          startDate: selectedDate,
+          endDate: selectedDate,
+          startTime,
+          endTime,
+          reason: preset.reason
+        })
+      });
+
+      if (res.ok) {
+        showToast(`${preset.label} bloqueado com sucesso!`, 'success');
+        setSelectedTimes(new Set());
+        fetchData();
+      }
+    } catch (error) {
+      showToast('Erro ao bloquear', 'error');
+    }
+    setSaving(false);
+  }
+
+  // Toggle single time slot
+  async function toggleTimeSlot(date: string, time: string) {
+    const isBlocked = isTimeSlotBlocked(date, time);
+    
+    if (isBlocked) {
+      // Find and delete the block
+      const block = blockedSlots.find(b =>
+        date >= b.start_date && date <= b.end_date &&
+        b.start_time && b.end_time &&
+        time >= b.start_time && time <= b.end_time
+      );
+      
+      if (block && confirm('Desbloquear este horário?')) {
+        await fetch(`/api/admin/blocks?id=${block.id}`, { method: 'DELETE' });
+        showToast('Horário desbloqueado!', 'success');
+        fetchData();
+      }
+    } else {
+      // Add to selected times
+      setSelectedTimes(prev => {
+        const next = new Set(prev);
+        if (next.has(time)) {
+          next.delete(time);
+        } else {
+          next.add(time);
+        }
+        return next;
+      });
+    }
+  }
+
+  // Handle time slot drag start
+  function handleTimeDragStart(time: string) {
+    setTimeDragStart(time);
+    setSelectedTimes(new Set([time]));
+  }
+
+  // Handle time slot drag over
+  function handleTimeDragOver(time: string) {
+    if (!timeDragStart) return;
+    
+    // Select all slots between start and current
+    const startIndex = TIME_SLOTS.indexOf(timeDragStart);
+    const currentIndex = TIME_SLOTS.indexOf(time);
+    
+    const start = Math.min(startIndex, currentIndex);
+    const end = Math.max(startIndex, currentIndex);
+    
+    const newSelected = new Set<string>();
+    for (let i = start; i <= end; i++) {
+      newSelected.add(TIME_SLOTS[i]);
+    }
+    setSelectedTimes(newSelected);
+  }
+
+  // Handle time slot drag end
+  function handleTimeDragEnd() {
+    setTimeDragStart(null);
+    // Keep selected slots for user to confirm
+  }
+
+  // Confirm bulk time block
+  async function confirmBulkTimeBlock(reason: string = 'Indisponível') {
+    if (selectedTimes.size === 0 || !selectedDate) return;
+    
+    setSaving(true);
+    const sortedTimes = TIME_SLOTS.filter(t => selectedTimes.has(t));
+    const startTime = sortedTimes[0];
+    const endTime = sortedTimes[sortedTimes.length - 1];
+    
+    try {
+      const res = await fetch('/api/admin/blocks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          startDate: selectedDate,
+          endDate: selectedDate,
+          startTime,
+          endTime,
+          reason
+        })
+      });
+
+      if (res.ok) {
+        showToast('Horários bloqueados!', 'success');
+        setSelectedTimes(new Set());
+        fetchData();
+      }
+    } catch (error) {
+      showToast('Erro ao bloquear', 'error');
+    }
+    setSaving(false);
+  }
+
+  // Cancel time selection
+  function cancelTimeSelection() {
+    setSelectedTimes(new Set());
+  }
+
+  // Block entire day
+  async function blockEntireDay(date: string, reason: string = 'Indisponível') {
+    setSaving(true);
+    try {
+      const res = await fetch('/api/admin/blocks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          startDate: date,
+          endDate: date,
+          reason
+        })
+      });
+
+      if (res.ok) {
+        showToast('Dia bloqueado!', 'success');
+        fetchData();
+      }
+    } catch (error) {
+      showToast('Erro ao bloquear', 'error');
+    }
+    setSaving(false);
+  }
+
+  // Unblock entire day
+  async function unblockEntireDay(date: string) {
+    const dayBlocks = blockedSlots.filter(b =>
+      date >= b.start_date && date <= b.end_date
+    );
+    
+    if (dayBlocks.length === 0) return;
+    
+    if (!confirm(`Desbloquear todos os ${dayBlocks.length} bloqueios deste dia?`)) return;
+    
+    setSaving(true);
+    try {
+      await Promise.all(
+        dayBlocks.map(block =>
+          fetch(`/api/admin/blocks?id=${block.id}`, { method: 'DELETE' })
+        )
+      );
+      showToast('Dia desbloqueado!', 'success');
+      fetchData();
+    } catch (error) {
+      showToast('Erro ao desbloquear', 'error');
+    }
+    setSaving(false);
+  }
+
+  // Original block slot handlers
   async function handleBlockSlot(e: React.FormEvent) {
     e.preventDefault();
+    setSaving(true);
     
     try {
       const res = await fetch('/api/admin/blocks', {
@@ -175,11 +413,13 @@ export default function SchedulePage() {
       if (res.ok) {
         setShowBlockModal(false);
         setBlockForm({ startDate: '', endDate: '', startTime: '', endTime: '', reason: '' });
+        showToast('Bloqueio criado!', 'success');
         fetchData();
       }
     } catch (error) {
-      console.error('Error blocking slot:', error);
+      showToast('Erro ao criar bloqueio', 'error');
     }
+    setSaving(false);
   }
 
   async function handleDeleteBlock(blockId: string) {
@@ -187,9 +427,10 @@ export default function SchedulePage() {
     
     try {
       await fetch(`/api/admin/blocks?id=${blockId}`, { method: 'DELETE' });
+      showToast('Bloqueio removido!', 'success');
       fetchData();
     } catch (error) {
-      console.error('Error deleting block:', error);
+      showToast('Erro ao remover', 'error');
     }
   }
 
@@ -200,14 +441,15 @@ export default function SchedulePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ booking_id: bookingId, status: newStatus })
       });
+      showToast('Status atualizado!', 'success');
       fetchData();
       setShowBookingModal(false);
     } catch (error) {
-      console.error('Error updating status:', error);
+      showToast('Erro ao atualizar', 'error');
     }
   }
 
-  // Navigate months
+  // Navigation
   function prevMonth() {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
   }
@@ -221,17 +463,12 @@ export default function SchedulePage() {
     setSelectedDate(new Date().toISOString().split('T')[0]);
   }
 
-  // Get date string for comparison
-  function dateStr(date: Date) {
-    return date.toISOString().split('T')[0];
-  }
-
-  // Get bookings for selected date
+  // Get selected date bookings
   const selectedDateBookings = selectedDate 
     ? bookings.filter(b => b.booking_date === selectedDate)
     : [];
 
-  // Get blocked slots for selected date
+  // Get selected date blocks
   const selectedDateBlocks = selectedDate
     ? blockedSlots.filter(block => 
         selectedDate >= block.start_date && selectedDate <= block.end_date
@@ -240,6 +477,15 @@ export default function SchedulePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30">
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed top-4 right-4 z-[100] px-4 py-3 rounded-xl shadow-lg animate-in slide-in-from-right ${
+          toast.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+        }`}>
+          {toast.message}
+        </div>
+      )}
+
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -250,7 +496,7 @@ export default function SchedulePage() {
               </div>
               <div>
                 <h1 className="font-bold text-gray-900">NomadWay</h1>
-                <p className="text-xs text-gray-500">Agenda</p>
+                <p className="text-xs text-gray-500">Agenda Interativa</p>
               </div>
             </div>
 
@@ -273,7 +519,7 @@ export default function SchedulePage() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
               {/* Month Navigation */}
               <div className="flex items-center justify-between mb-4">
-                <button onClick={prevMonth} className="p-2 hover:bg-gray-100 rounded-lg">
+                <button onClick={prevMonth} className="px-3 py-2 hover:bg-gray-100 rounded-lg transition-all">
                   ← Anterior
                 </button>
                 <div className="text-center">
@@ -282,7 +528,7 @@ export default function SchedulePage() {
                     Ir para hoje
                   </button>
                 </div>
-                <button onClick={nextMonth} className="p-2 hover:bg-gray-100 rounded-lg">
+                <button onClick={nextMonth} className="px-3 py-2 hover:bg-gray-100 rounded-lg transition-all">
                   Próximo →
                 </button>
               </div>
@@ -306,6 +552,9 @@ export default function SchedulePage() {
                   const dateStrVal = dateStr(date);
                   const dayBookings = getBookingsForDate(dateStrVal);
                   const blocked = isDateBlocked(dateStrVal);
+                  const hasTimeBlocks = blockedSlots.some(b =>
+                    dateStrVal >= b.start_date && dateStrVal <= b.end_date && b.start_time
+                  );
                   const isToday = dateStrVal === dateStr(new Date());
                   const isSelected = dateStrVal === selectedDate;
                   const isSunday = date.getDay() === 0;
@@ -314,19 +563,28 @@ export default function SchedulePage() {
                     <button
                       key={idx}
                       onClick={() => setSelectedDate(dateStrVal)}
+                      onDoubleClick={() => {
+                        if (!isSunday && !blocked) {
+                          blockEntireDay(dateStrVal);
+                        } else if (blocked) {
+                          unblockEntireDay(dateStrVal);
+                        }
+                      }}
                       disabled={isSunday}
                       className={`aspect-square rounded-lg flex flex-col items-center justify-center relative transition-all ${
                         isSunday
                           ? 'bg-gray-50 text-gray-300 cursor-not-allowed'
                           : isSelected
-                          ? 'bg-blue-500 text-white ring-2 ring-blue-300'
+                          ? 'bg-blue-500 text-white ring-2 ring-blue-300 scale-105'
                           : isToday
                           ? 'bg-blue-50 text-blue-700 ring-2 ring-blue-200'
                           : blocked
-                          ? 'bg-red-50 text-red-600'
+                          ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                          : hasTimeBlocks
+                          ? 'bg-orange-50 text-orange-600 hover:bg-orange-100'
                           : dayBookings.length > 0
                           ? 'bg-green-50 text-green-700 hover:bg-green-100'
-                          : 'hover:bg-gray-50'
+                          : 'hover:bg-gray-50 border border-transparent hover:border-gray-200'
                       }`}
                     >
                       <span className="text-sm font-medium">{date.getDate()}</span>
@@ -336,7 +594,10 @@ export default function SchedulePage() {
                         </span>
                       )}
                       {blocked && !isSunday && (
-                        <span className="text-xs">🚫</span>
+                        <span className="text-xs absolute bottom-1">🚫</span>
+                      )}
+                      {hasTimeBlocks && !blocked && !isSunday && (
+                        <span className="text-xs absolute bottom-1">🕐</span>
                       )}
                     </button>
                   );
@@ -350,12 +611,19 @@ export default function SchedulePage() {
                   <span className="text-gray-600">Com agendamentos</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-red-50"></div>
-                  <span className="text-gray-600">Bloqueado</span>
+                  <div className="w-4 h-4 rounded bg-red-100"></div>
+                  <span className="text-gray-600">Dia bloqueado</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded bg-orange-50"></div>
+                  <span className="text-gray-600">Horários bloqueados</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded bg-blue-50"></div>
                   <span className="text-gray-600">Hoje</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-500 italic">
+                  💡 Duplo clique para bloquear/desbloquear dia
                 </div>
               </div>
             </div>
@@ -363,7 +631,7 @@ export default function SchedulePage() {
 
           {/* Day Detail */}
           <div className="space-y-4">
-            {/* Date Header */}
+            {/* Date Header with Quick Actions */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-gray-900">
@@ -372,61 +640,165 @@ export default function SchedulePage() {
                     : 'Selecione uma data'
                   }
                 </h3>
-                <button
-                  onClick={() => {
-                    setBlockForm({
-                      startDate: selectedDate || '',
-                      endDate: selectedDate || '',
-                      startTime: '',
-                      endTime: '',
-                      reason: ''
-                    });
-                    setShowBlockModal(true);
-                  }}
-                  className="text-sm px-3 py-1 bg-red-50 text-red-600 rounded-lg hover:bg-red-100"
-                  disabled={!selectedDate}
-                >
-                  🚫 Bloquear
-                </button>
+                {selectedDate && !isDateBlocked(selectedDate) && (
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowQuickActions(!showQuickActions)}
+                      className="text-sm px-3 py-1 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"
+                    >
+                      ⚡ Ações Rápidas
+                    </button>
+                    
+                    {showQuickActions && (
+                      <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-xl border border-gray-100 z-10 min-w-[180px] p-2 space-y-1">
+                        {QUICK_BLOCKS.map((preset, i) => (
+                          <button
+                            key={i}
+                            onClick={() => {
+                              handleQuickBlock(preset);
+                              setShowQuickActions(false);
+                            }}
+                            className="w-full text-left px-3 py-2 hover:bg-gray-50 rounded-lg text-sm"
+                          >
+                            {preset.label}
+                            {preset.fullDay ? ' (dia inteiro)' : ` (${preset.startTime} - ${preset.endTime})`}
+                          </button>
+                        ))}
+                        <div className="border-t my-2 pt-2">
+                          <button
+                            onClick={() => {
+                              setShowBlockModal(true);
+                              setBlockForm({
+                                startDate: selectedDate || '',
+                                endDate: selectedDate || '',
+                                startTime: '',
+                                endTime: '',
+                                reason: ''
+                              });
+                              setShowQuickActions(false);
+                            }}
+                            className="w-full text-left px-3 py-2 hover:bg-gray-50 rounded-lg text-sm text-red-600"
+                          >
+                            🚫 Bloqueio personalizado
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
+
+              {/* Selected Time Slots Actions */}
+              {selectedTimes.size > 0 && (
+                <div className="mb-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-orange-800">
+                      {selectedTimes.size} horário{selectedTimes.size > 1 ? 's' : ''} selecionado{selectedTimes.size > 1 ? 's' : ''}
+                    </span>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Motivo (opcional)"
+                        className="text-sm px-2 py-1 border border-orange-200 rounded-lg w-32"
+                        id="blockReason"
+                      />
+                      <button
+                        onClick={() => {
+                          const reason = (document.getElementById('blockReason') as HTMLInputElement)?.value || 'Indisponível';
+                          confirmBulkTimeBlock(reason);
+                        }}
+                        disabled={saving}
+                        className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 disabled:opacity-50"
+                      >
+                        {saving ? 'Salvando...' : 'Bloquear'}
+                      </button>
+                      <button
+                        onClick={cancelTimeSelection}
+                        className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Time Slots */}
               {selectedDate && (
                 <div className="space-y-1 max-h-[400px] overflow-y-auto">
                   {TIME_SLOTS.map(time => {
                     const booking = selectedDateBookings.find(b => b.booking_time === time);
-                    const blocked = selectedDateBlocks.some(block =>
-                      block.start_time && block.end_time &&
-                      time >= block.start_time && time <= block.end_time
-                    );
+                    const blocked = isTimeSlotBlocked(selectedDate, time);
+                    const isSelected = selectedTimes.has(time);
+                    const dayBlocked = isDateBlocked(selectedDate);
 
                     return (
                       <div
                         key={time}
-                        className={`p-2 rounded-lg border ${
-                          blocked
-                            ? 'bg-red-50 border-red-200'
+                        className={`p-2 rounded-lg border transition-all cursor-pointer ${
+                          dayBlocked
+                            ? 'bg-gray-100 border-gray-200 opacity-50'
+                            : isSelected
+                            ? 'bg-orange-100 border-orange-300 ring-2 ring-orange-400'
+                            : blocked
+                            ? 'bg-red-50 border-red-200 hover:bg-red-100'
                             : booking
-                            ? `cursor-pointer hover:opacity-80 ${STATUS_COLORS[booking.status]}`
-                            : 'bg-gray-50 border-gray-100'
+                            ? `${STATUS_COLORS[booking.status]} hover:opacity-80`
+                            : 'bg-gray-50 border-gray-100 hover:bg-gray-100 hover:border-gray-200'
                         }`}
                         onClick={() => {
+                          if (dayBlocked) return;
                           if (booking) {
                             setSelectedBooking(booking);
                             setShowBookingModal(true);
+                          } else {
+                            toggleTimeSlot(selectedDate, time);
+                          }
+                        }}
+                        onMouseDown={() => {
+                          if (!dayBlocked && !booking) {
+                            handleTimeDragStart(time);
+                          }
+                        }}
+                        onMouseEnter={() => {
+                          if (timeDragStart && !dayBlocked && !booking) {
+                            handleTimeDragOver(time);
+                          }
+                        }}
+                        onMouseUp={() => {
+                          if (timeDragStart) {
+                            handleTimeDragEnd();
                           }
                         }}
                       >
                         <div className="flex items-center justify-between">
                           <span className="font-medium text-sm">{time}</span>
-                          {blocked && <span className="text-xs text-red-500">🚫 Bloqueado</span>}
-                          {booking && (
+                          {dayBlocked && <span className="text-xs text-gray-400">Dia bloqueado</span>}
+                          {blocked && !dayBlocked && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteBlock(blockedSlots.find(b =>
+                                  selectedDate >= b.start_date && selectedDate <= b.end_date &&
+                                  b.start_time && b.end_time &&
+                                  time >= b.start_time && time <= b.end_time
+                                )?.id || '');
+                              }}
+                              className="text-xs text-red-500 hover:text-red-700"
+                            >
+                              ✕ Desbloquear
+                            </button>
+                          )}
+                          {booking && !dayBlocked && !blocked && (
                             <span className="text-xs">
                               {booking.customer_name.split(' ')[0]}
                             </span>
                           )}
+                          {isSelected && !booking && !blocked && (
+                            <span className="text-xs text-orange-600 font-medium">Selecionado</span>
+                          )}
                         </div>
-                        {booking && (
+                        {booking && !dayBlocked && !blocked && (
                           <div className="text-xs opacity-75 mt-1">
                             {booking.service_name} • {formatPrice(booking.price_cents || 149990)}
                           </div>
@@ -436,6 +808,14 @@ export default function SchedulePage() {
                   })}
                 </div>
               )}
+
+              {/* Quick tips */}
+              <div className="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500 space-y-1">
+                <p>💡 <strong>Clique</strong> em um horário vazio para selecionar</p>
+                <p>💡 <strong>Arraste</strong> para selecionar múltiplos horários</p>
+                <p>💡 <strong>Clique</strong> em um bloqueio para remover</p>
+                <p>💡 <strong>Duplo clique</strong> no dia para bloquear/desbloquear tudo</p>
+              </div>
 
               {/* Blocked slots for this date */}
               {selectedDateBlocks.length > 0 && (
@@ -450,7 +830,7 @@ export default function SchedulePage() {
                       </span>
                       <button
                         onClick={() => handleDeleteBlock(block.id)}
-                        className="text-red-500 hover:text-red-700"
+                        className="text-red-500 hover:text-red-700 ml-2"
                       >
                         ✕
                       </button>
@@ -463,7 +843,7 @@ export default function SchedulePage() {
             {/* Blocked Dates List */}
             {blockedSlots.length > 0 && (
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-                <h4 className="font-medium text-gray-900 mb-3">Datas Bloqueadas</h4>
+                <h4 className="font-medium text-gray-900 mb-3">📅 Todos os Bloqueios</h4>
                 <div className="space-y-2 max-h-[200px] overflow-y-auto">
                   {blockedSlots.slice(0, 10).map(block => (
                     <div key={block.id} className="flex items-center justify-between py-2 px-3 bg-red-50 rounded-lg">
@@ -474,6 +854,9 @@ export default function SchedulePage() {
                             <> - {new Date(block.end_date).toLocaleDateString('pt-BR')}</>
                           )}
                         </div>
+                        {block.start_time && (
+                          <div className="text-xs text-red-600">{block.start_time} - {block.end_time}</div>
+                        )}
                         {block.reason && (
                           <div className="text-xs text-red-600">{block.reason}</div>
                         )}
@@ -486,6 +869,11 @@ export default function SchedulePage() {
                       </button>
                     </div>
                   ))}
+                  {blockedSlots.length > 10 && (
+                    <div className="text-center text-sm text-gray-500 pt-2">
+                      +{blockedSlots.length - 10} mais bloqueios
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -497,7 +885,7 @@ export default function SchedulePage() {
       {showBlockModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowBlockModal(false)}>
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6" onClick={e => e.stopPropagation()}>
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Bloquear Horário</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">🚫 Bloqueio Personalizado</h3>
             <form onSubmit={handleBlockSlot} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -506,7 +894,7 @@ export default function SchedulePage() {
                     type="date"
                     value={blockForm.startDate}
                     onChange={e => setBlockForm({ ...blockForm, startDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     required
                   />
                 </div>
@@ -516,7 +904,7 @@ export default function SchedulePage() {
                     type="date"
                     value={blockForm.endDate}
                     onChange={e => setBlockForm({ ...blockForm, endDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -527,7 +915,7 @@ export default function SchedulePage() {
                   <select
                     value={blockForm.startTime}
                     onChange={e => setBlockForm({ ...blockForm, startTime: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="">Dia inteiro</option>
                     {TIME_SLOTS.map(time => (
@@ -540,7 +928,7 @@ export default function SchedulePage() {
                   <select
                     value={blockForm.endTime}
                     onChange={e => setBlockForm({ ...blockForm, endTime: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     disabled={!blockForm.startTime}
                   >
                     <option value="">-</option>
@@ -558,16 +946,17 @@ export default function SchedulePage() {
                   value={blockForm.reason}
                   onChange={e => setBlockForm({ ...blockForm, reason: e.target.value })}
                   placeholder="Ex: Feriado, Férias, Compromisso..."
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div className="flex gap-3">
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600"
+                  disabled={saving}
+                  className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 disabled:opacity-50 transition-all"
                 >
-                  Bloquear
+                  {saving ? 'Salvando...' : 'Bloquear'}
                 </button>
                 <button
                   type="button"
