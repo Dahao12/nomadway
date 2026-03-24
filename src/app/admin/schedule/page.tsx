@@ -17,6 +17,7 @@ interface Booking {
   status: string;
   notes: string;
   created_at: string;
+  lead_temperature?: string;
 }
 
 interface BlockedSlot {
@@ -37,6 +38,14 @@ const STATUS_COLORS: Record<string, string> = {
   cancelled: 'bg-red-100 text-red-700 border-red-200',
 };
 
+const STATUS_LABELS: Record<string, string> = {
+  pending: '⏳ Pendente',
+  confirmed: '✓ Confirmado',
+  form_sent: '📝 Form Enviado',
+  completed: '✅ Concluído',
+  cancelled: '❌ Cancelado',
+};
+
 const TIME_SLOTS = [
   '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
   '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
@@ -45,7 +54,6 @@ const TIME_SLOTS = [
   '21:00', '21:30', '22:00', '22:30', '23:00', '23:30'
 ];
 
-// Quick block presets
 const QUICK_BLOCKS = [
   { label: '🌞 Almoço', startTime: '12:00', endTime: '14:00', reason: 'Almoço' },
   { label: '📅 Feriado', reason: 'Feriado', fullDay: true },
@@ -60,6 +68,7 @@ const MONTHS = [
 ];
 
 const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+const WEEKDAYS_FULL = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 
 export default function SchedulePage() {
   const router = useRouter();
@@ -72,15 +81,13 @@ export default function SchedulePage() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   
-  // Multi-select for dragging
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState<string | null>(null);
-  const [dragEnd, setDragEnd] = useState<string | null>(null);
-  const [selectedSlots, setSelectedSlots] = useState<Set<string>>(new Set());
-  
   // Time slot multi-select
   const [timeDragStart, setTimeDragStart] = useState<string | null>(null);
   const [selectedTimes, setSelectedTimes] = useState<Set<string>>(new Set());
+  
+  // View state
+  const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   
   // Modal states
   const [showBlockModal, setShowBlockModal] = useState(false);
@@ -103,12 +110,9 @@ export default function SchedulePage() {
   }, []);
 
   useEffect(() => {
-    if (selectedDate) {
-      fetchData();
-    }
-  }, [selectedDate]);
+    fetchData();
+  }, []);
 
-  // Auto-dismiss toast
   useEffect(() => {
     if (toast) {
       const timer = setTimeout(() => setToast(null), 3000);
@@ -128,7 +132,6 @@ export default function SchedulePage() {
           router.push('/admin/login');
           return;
         }
-        fetchData();
       })
       .catch(() => router.push('/admin/login'));
   }
@@ -137,7 +140,7 @@ export default function SchedulePage() {
     setLoading(true);
     try {
       const [bookingsRes, blocksRes] = await Promise.all([
-        fetch(`/api/admin/bookings?date=${selectedDate || new Date().toISOString().split('T')[0]}`),
+        fetch(`/api/admin/bookings?date=${new Date().toISOString().split('T')[0]}`),
         fetch('/api/admin/blocks')
       ]);
 
@@ -156,12 +159,15 @@ export default function SchedulePage() {
     setLoading(false);
   }
 
-  // Date string helper
+  // Date helpers
   function dateStr(date: Date) {
     return date.toISOString().split('T')[0];
   }
 
-  // Calendar helpers
+  function formatDate(dateStr: string) {
+    return new Date(dateStr + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' });
+  }
+
   function getDaysInMonth(date: Date) {
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -203,9 +209,57 @@ export default function SchedulePage() {
     return `€${(cents / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
   }
 
-  // ===== INTERACTIVE BLOCKING =====
+  // Get upcoming bookings (next 7 days)
+  function getUpcomingBookings() {
+    const today = dateStr(new Date());
+    const nextWeek = dateStr(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
+    
+    return bookings
+      .filter(b => b.booking_date >= today && b.booking_date <= nextWeek)
+      .filter(b => statusFilter === 'all' || b.status === statusFilter)
+      .sort((a, b) => {
+        if (a.booking_date !== b.booking_date) return a.booking_date.localeCompare(b.booking_date);
+        return (a.booking_time || '').localeCompare(b.booking_time || '');
+      });
+  }
 
-  // Quick block - predefined actions
+  // Get bookings grouped by date
+  function getBookingsByDate() {
+    const upcoming = getUpcomingBookings();
+    const grouped: Record<string, Booking[]> = {};
+    
+    upcoming.forEach(booking => {
+      if (!grouped[booking.booking_date]) {
+        grouped[booking.booking_date] = [];
+      }
+      grouped[booking.booking_date].push(booking);
+    });
+    
+    return grouped;
+  }
+
+  // Get statistics
+  function getStats() {
+    const today = dateStr(new Date());
+    const thisWeek = bookings.filter(b => {
+      const bookingDate = new Date(b.booking_date);
+      const now = new Date();
+      const weekFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      return bookingDate >= now && bookingDate <= weekFromNow;
+    });
+
+    return {
+      total: bookings.length,
+      pending: bookings.filter(b => b.status === 'pending').length,
+      confirmed: bookings.filter(b => b.status === 'confirmed').length,
+      today: bookings.filter(b => b.booking_date === today).length,
+      thisWeek: thisWeek.length,
+      hot: bookings.filter(b => b.lead_temperature === 'hot').length,
+      warm: bookings.filter(b => b.lead_temperature === 'warm').length,
+    };
+  }
+
+  // Block handlers
   async function handleQuickBlock(preset: typeof QUICK_BLOCKS[0]) {
     if (!selectedDate) return;
 
@@ -214,7 +268,6 @@ export default function SchedulePage() {
       let startTime = preset.startTime || null;
       let endTime = preset.endTime || null;
       
-      // If time slots are selected, use them instead
       if (selectedTimes.size > 0) {
         const sortedTimes = TIME_SLOTS.filter(t => selectedTimes.has(t));
         startTime = sortedTimes[0];
@@ -244,12 +297,10 @@ export default function SchedulePage() {
     setSaving(false);
   }
 
-  // Toggle single time slot
   async function toggleTimeSlot(date: string, time: string) {
     const isBlocked = isTimeSlotBlocked(date, time);
     
     if (isBlocked) {
-      // Find and delete the block
       const block = blockedSlots.find(b =>
         date >= b.start_date && date <= b.end_date &&
         b.start_time && b.end_time &&
@@ -262,7 +313,6 @@ export default function SchedulePage() {
         fetchData();
       }
     } else {
-      // Add to selected times
       setSelectedTimes(prev => {
         const next = new Set(prev);
         if (next.has(time)) {
@@ -275,17 +325,14 @@ export default function SchedulePage() {
     }
   }
 
-  // Handle time slot drag start
   function handleTimeDragStart(time: string) {
     setTimeDragStart(time);
     setSelectedTimes(new Set([time]));
   }
 
-  // Handle time slot drag over
   function handleTimeDragOver(time: string) {
     if (!timeDragStart) return;
     
-    // Select all slots between start and current
     const startIndex = TIME_SLOTS.indexOf(timeDragStart);
     const currentIndex = TIME_SLOTS.indexOf(time);
     
@@ -299,13 +346,10 @@ export default function SchedulePage() {
     setSelectedTimes(newSelected);
   }
 
-  // Handle time slot drag end
   function handleTimeDragEnd() {
     setTimeDragStart(null);
-    // Keep selected slots for user to confirm
   }
 
-  // Confirm bulk time block
   async function confirmBulkTimeBlock(reason: string = 'Indisponível') {
     if (selectedTimes.size === 0 || !selectedDate) return;
     
@@ -338,12 +382,10 @@ export default function SchedulePage() {
     setSaving(false);
   }
 
-  // Cancel time selection
   function cancelTimeSelection() {
     setSelectedTimes(new Set());
   }
 
-  // Block entire day
   async function blockEntireDay(date: string, reason: string = 'Indisponível') {
     setSaving(true);
     try {
@@ -367,7 +409,6 @@ export default function SchedulePage() {
     setSaving(false);
   }
 
-  // Unblock entire day
   async function unblockEntireDay(date: string) {
     const dayBlocks = blockedSlots.filter(b =>
       date >= b.start_date && date <= b.end_date
@@ -392,7 +433,6 @@ export default function SchedulePage() {
     setSaving(false);
   }
 
-  // Original block slot handlers
   async function handleBlockSlot(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -463,17 +503,20 @@ export default function SchedulePage() {
     setSelectedDate(new Date().toISOString().split('T')[0]);
   }
 
-  // Get selected date bookings
+  // Get selected date bookings and blocks
   const selectedDateBookings = selectedDate 
     ? bookings.filter(b => b.booking_date === selectedDate)
     : [];
 
-  // Get selected date blocks
   const selectedDateBlocks = selectedDate
     ? blockedSlots.filter(block => 
         selectedDate >= block.start_date && selectedDate <= block.end_date
       )
     : [];
+
+  const stats = getStats();
+  const upcomingBookings = getUpcomingBookings();
+  const bookingsByDate = getBookingsByDate();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30">
@@ -501,8 +544,32 @@ export default function SchedulePage() {
             </div>
 
             <div className="flex items-center gap-2">
+              {/* View Toggle */}
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setViewMode('calendar')}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
+                    viewMode === 'calendar' 
+                      ? 'bg-white text-gray-900 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  📅 Calendário
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
+                    viewMode === 'list' 
+                      ? 'bg-white text-gray-900 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  📋 Lista
+                </button>
+              </div>
+
               <button onClick={() => router.push('/admin/bookings')} className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
-                📋 Lista
+                📋 Gerenciar
               </button>
               <button onClick={() => router.push('/admin/kanban')} className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
                 📊 Pipeline
@@ -513,340 +580,564 @@ export default function SchedulePage() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Calendar */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-              {/* Month Navigation */}
-              <div className="flex items-center justify-between mb-4">
-                <button onClick={prevMonth} className="px-3 py-2 hover:bg-gray-100 rounded-lg transition-all">
-                  ← Anterior
-                </button>
-                <div className="text-center">
-                  <h2 className="text-lg font-semibold">{MONTHS[currentDate.getMonth()]} {currentDate.getFullYear()}</h2>
-                  <button onClick={goToToday} className="text-sm text-blue-600 hover:underline">
-                    Ir para hoje
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Pendentes</p>
+                <p className="text-2xl font-bold text-amber-600">{stats.pending}</p>
+              </div>
+              <div className="text-3xl">⏳</div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Confirmados</p>
+                <p className="text-2xl font-bold text-blue-600">{stats.confirmed}</p>
+              </div>
+              <div className="text-3xl">✓</div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Hoje</p>
+                <p className="text-2xl font-bold text-green-600">{stats.today}</p>
+              </div>
+              <div className="text-3xl">📅</div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Esta Semana</p>
+                <p className="text-2xl font-bold text-purple-600">{stats.thisWeek}</p>
+              </div>
+              <div className="text-3xl">📊</div>
+            </div>
+          </div>
+        </div>
+
+        {viewMode === 'calendar' ? (
+          /* Calendar View */
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Calendar */}
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                {/* Month Navigation */}
+                <div className="flex items-center justify-between mb-4">
+                  <button onClick={prevMonth} className="px-3 py-2 hover:bg-gray-100 rounded-lg transition-all">
+                    ← Anterior
+                  </button>
+                  <div className="text-center">
+                    <h2 className="text-lg font-semibold">{MONTHS[currentDate.getMonth()]} {currentDate.getFullYear()}</h2>
+                    <button onClick={goToToday} className="text-sm text-blue-600 hover:underline">
+                      Ir para hoje
+                    </button>
+                  </div>
+                  <button onClick={nextMonth} className="px-3 py-2 hover:bg-gray-100 rounded-lg transition-all">
+                    Próximo →
                   </button>
                 </div>
-                <button onClick={nextMonth} className="px-3 py-2 hover:bg-gray-100 rounded-lg transition-all">
-                  Próximo →
-                </button>
-              </div>
 
-              {/* Weekday Headers */}
-              <div className="grid grid-cols-7 gap-1 mb-2">
-                {WEEKDAYS.map(day => (
-                  <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
-                    {day}
+                {/* Weekday Headers */}
+                <div className="grid grid-cols-7 gap-1 mb-2">
+                  {WEEKDAYS.map(day => (
+                    <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
+                      {day}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Calendar Grid */}
+                <div className="grid grid-cols-7 gap-1">
+                  {getDaysInMonth(currentDate).map((date, idx) => {
+                    if (!date) {
+                      return <div key={idx} className="aspect-square" />;
+                    }
+
+                    const dateStrVal = dateStr(date);
+                    const dayBookings = getBookingsForDate(dateStrVal);
+                    const blocked = isDateBlocked(dateStrVal);
+                    const hasTimeBlocks = blockedSlots.some(b =>
+                      dateStrVal >= b.start_date && dateStrVal <= b.end_date && b.start_time
+                    );
+                    const isToday = dateStrVal === dateStr(new Date());
+                    const isSelected = dateStrVal === selectedDate;
+                    const isSunday = date.getDay() === 0;
+
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => setSelectedDate(dateStrVal)}
+                        onDoubleClick={() => {
+                          if (!isSunday && !blocked) {
+                            blockEntireDay(dateStrVal);
+                          } else if (blocked) {
+                            unblockEntireDay(dateStrVal);
+                          }
+                        }}
+                        disabled={isSunday}
+                        className={`aspect-square rounded-lg flex flex-col items-center justify-center relative transition-all ${
+                          isSunday
+                            ? 'bg-gray-50 text-gray-300 cursor-not-allowed'
+                            : isSelected
+                            ? 'bg-blue-500 text-white ring-2 ring-blue-300 scale-105'
+                            : isToday
+                            ? 'bg-blue-50 text-blue-700 ring-2 ring-blue-200'
+                            : blocked
+                            ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                            : hasTimeBlocks
+                            ? 'bg-orange-50 text-orange-600 hover:bg-orange-100'
+                            : dayBookings.length > 0
+                            ? 'bg-green-50 text-green-700 hover:bg-green-100'
+                            : 'hover:bg-gray-50 border border-transparent hover:border-gray-200'
+                        }`}
+                      >
+                        <span className="text-sm font-medium">{date.getDate()}</span>
+                        {dayBookings.length > 0 && !isSunday && (
+                          <span className={`text-xs ${isSelected ? 'text-white/80' : 'text-green-600'}`}>
+                            {dayBookings.length}
+                          </span>
+                        )}
+                        {blocked && !isSunday && (
+                          <span className="text-xs absolute bottom-1">🚫</span>
+                        )}
+                        {hasTimeBlocks && !blocked && !isSunday && (
+                          <span className="text-xs absolute bottom-1">🕐</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Legend */}
+                <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-gray-100 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded bg-green-50"></div>
+                    <span className="text-gray-600">Com agendamentos</span>
                   </div>
-                ))}
-              </div>
-
-              {/* Calendar Grid */}
-              <div className="grid grid-cols-7 gap-1">
-                {getDaysInMonth(currentDate).map((date, idx) => {
-                  if (!date) {
-                    return <div key={idx} className="aspect-square" />;
-                  }
-
-                  const dateStrVal = dateStr(date);
-                  const dayBookings = getBookingsForDate(dateStrVal);
-                  const blocked = isDateBlocked(dateStrVal);
-                  const hasTimeBlocks = blockedSlots.some(b =>
-                    dateStrVal >= b.start_date && dateStrVal <= b.end_date && b.start_time
-                  );
-                  const isToday = dateStrVal === dateStr(new Date());
-                  const isSelected = dateStrVal === selectedDate;
-                  const isSunday = date.getDay() === 0;
-
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => setSelectedDate(dateStrVal)}
-                      onDoubleClick={() => {
-                        if (!isSunday && !blocked) {
-                          blockEntireDay(dateStrVal);
-                        } else if (blocked) {
-                          unblockEntireDay(dateStrVal);
-                        }
-                      }}
-                      disabled={isSunday}
-                      className={`aspect-square rounded-lg flex flex-col items-center justify-center relative transition-all ${
-                        isSunday
-                          ? 'bg-gray-50 text-gray-300 cursor-not-allowed'
-                          : isSelected
-                          ? 'bg-blue-500 text-white ring-2 ring-blue-300 scale-105'
-                          : isToday
-                          ? 'bg-blue-50 text-blue-700 ring-2 ring-blue-200'
-                          : blocked
-                          ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                          : hasTimeBlocks
-                          ? 'bg-orange-50 text-orange-600 hover:bg-orange-100'
-                          : dayBookings.length > 0
-                          ? 'bg-green-50 text-green-700 hover:bg-green-100'
-                          : 'hover:bg-gray-50 border border-transparent hover:border-gray-200'
-                      }`}
-                    >
-                      <span className="text-sm font-medium">{date.getDate()}</span>
-                      {dayBookings.length > 0 && !isSunday && (
-                        <span className={`text-xs ${isSelected ? 'text-white/80' : 'text-green-600'}`}>
-                          {dayBookings.length}
-                        </span>
-                      )}
-                      {blocked && !isSunday && (
-                        <span className="text-xs absolute bottom-1">🚫</span>
-                      )}
-                      {hasTimeBlocks && !blocked && !isSunday && (
-                        <span className="text-xs absolute bottom-1">🕐</span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Legend */}
-              <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-gray-100 text-sm">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-green-50"></div>
-                  <span className="text-gray-600">Com agendamentos</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-red-100"></div>
-                  <span className="text-gray-600">Dia bloqueado</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-orange-50"></div>
-                  <span className="text-gray-600">Horários bloqueados</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-blue-50"></div>
-                  <span className="text-gray-600">Hoje</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-500 italic">
-                  💡 Duplo clique para bloquear/desbloquear dia
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded bg-red-100"></div>
+                    <span className="text-gray-600">Dia bloqueado</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded bg-orange-50"></div>
+                    <span className="text-gray-600">Horários bloqueados</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded bg-blue-50"></div>
+                    <span className="text-gray-600">Hoje</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-500 italic">
+                    💡 Duplo clique para bloquear/desbloquear dia
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Day Detail */}
-          <div className="space-y-4">
-            {/* Date Header with Quick Actions */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-gray-900">
-                  {selectedDate 
-                    ? new Date(selectedDate + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
-                    : 'Selecione uma data'
-                  }
-                </h3>
-                {selectedDate && !isDateBlocked(selectedDate) && (
-                  <div className="relative">
-                    <button
-                      onClick={() => setShowQuickActions(!showQuickActions)}
-                      className="text-sm px-3 py-1 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"
-                    >
-                      ⚡ Ações Rápidas
-                    </button>
-                    
-                    {showQuickActions && (
-                      <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-xl border border-gray-100 z-10 min-w-[180px] p-2 space-y-1">
-                        {QUICK_BLOCKS.map((preset, i) => (
-                          <button
-                            key={i}
-                            onClick={() => {
-                              handleQuickBlock(preset);
-                              setShowQuickActions(false);
-                            }}
-                            className="w-full text-left px-3 py-2 hover:bg-gray-50 rounded-lg text-sm"
-                          >
-                            {preset.label}
-                            {preset.fullDay ? ' (dia inteiro)' : ` (${preset.startTime} - ${preset.endTime})`}
-                          </button>
-                        ))}
-                        <div className="border-t my-2 pt-2">
-                          <button
-                            onClick={() => {
-                              setShowBlockModal(true);
-                              setBlockForm({
-                                startDate: selectedDate || '',
-                                endDate: selectedDate || '',
-                                startTime: '',
-                                endTime: '',
-                                reason: ''
-                              });
-                              setShowQuickActions(false);
-                            }}
-                            className="w-full text-left px-3 py-2 hover:bg-gray-50 rounded-lg text-sm text-red-600"
-                          >
-                            🚫 Bloqueio personalizado
-                          </button>
+            {/* Day Detail */}
+            <div className="space-y-4">
+              {/* Date Header with Quick Actions */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold text-gray-900">
+                    {selectedDate 
+                      ? new Date(selectedDate + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
+                      : 'Selecione uma data'
+                    }
+                  </h3>
+                  {selectedDate && !isDateBlocked(selectedDate) && (
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowQuickActions(!showQuickActions)}
+                        className="text-sm px-3 py-1 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"
+                      >
+                        ⚡ Ações Rápidas
+                      </button>
+                      
+                      {showQuickActions && (
+                        <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-xl border border-gray-100 z-10 min-w-[180px] p-2 space-y-1">
+                          {QUICK_BLOCKS.map((preset, i) => (
+                            <button
+                              key={i}
+                              onClick={() => {
+                                handleQuickBlock(preset);
+                                setShowQuickActions(false);
+                              }}
+                              className="w-full text-left px-3 py-2 hover:bg-gray-50 rounded-lg text-sm"
+                            >
+                              {preset.label}
+                              {preset.fullDay ? ' (dia inteiro)' : ` (${preset.startTime} - ${preset.endTime})`}
+                            </button>
+                          ))}
+                          <div className="border-t my-2 pt-2">
+                            <button
+                              onClick={() => {
+                                setShowBlockModal(true);
+                                setBlockForm({
+                                  startDate: selectedDate || '',
+                                  endDate: selectedDate || '',
+                                  startTime: '',
+                                  endTime: '',
+                                  reason: ''
+                                });
+                                setShowQuickActions(false);
+                              }}
+                              className="w-full text-left px-3 py-2 hover:bg-gray-50 rounded-lg text-sm text-red-600"
+                            >
+                              🚫 Bloqueio personalizado
+                            </button>
+                          </div>
                         </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Selected Time Slots Actions */}
+                {selectedTimes.size > 0 && (
+                  <div className="mb-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-orange-800">
+                        {selectedTimes.size} horário{selectedTimes.size > 1 ? 's' : ''} selecionado{selectedTimes.size > 1 ? 's' : ''}
+                      </span>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="Motivo (opcional)"
+                          className="text-sm px-2 py-1 border border-orange-200 rounded-lg w-32"
+                          id="blockReason"
+                        />
+                        <button
+                          onClick={() => {
+                            const reason = (document.getElementById('blockReason') as HTMLInputElement)?.value || 'Indisponível';
+                            confirmBulkTimeBlock(reason);
+                          }}
+                          disabled={saving}
+                          className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 disabled:opacity-50"
+                        >
+                          {saving ? 'Salvando...' : 'Bloquear'}
+                        </button>
+                        <button
+                          onClick={cancelTimeSelection}
+                          className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200"
+                        >
+                          Cancelar
+                        </button>
                       </div>
-                    )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Time Slots */}
+                {selectedDate && (
+                  <div className="space-y-1 max-h-[400px] overflow-y-auto">
+                    {TIME_SLOTS.map(time => {
+                      const booking = selectedDateBookings.find(b => b.booking_time === time);
+                      const blocked = isTimeSlotBlocked(selectedDate, time);
+                      const isSelected = selectedTimes.has(time);
+                      const dayBlocked = isDateBlocked(selectedDate);
+
+                      return (
+                        <div
+                          key={time}
+                          className={`p-2 rounded-lg border transition-all cursor-pointer ${
+                            dayBlocked
+                              ? 'bg-gray-100 border-gray-200 opacity-50'
+                              : isSelected
+                              ? 'bg-orange-100 border-orange-300 ring-2 ring-orange-400'
+                              : blocked
+                              ? 'bg-red-50 border-red-200 hover:bg-red-100'
+                              : booking
+                              ? `${STATUS_COLORS[booking.status]} hover:opacity-80`
+                              : 'bg-gray-50 border-gray-100 hover:bg-gray-100 hover:border-gray-200'
+                          }`}
+                          onClick={() => {
+                            if (dayBlocked) return;
+                            if (booking) {
+                              setSelectedBooking(booking);
+                              setShowBookingModal(true);
+                            } else {
+                              toggleTimeSlot(selectedDate, time);
+                            }
+                          }}
+                          onMouseDown={() => {
+                            if (!dayBlocked && !booking) {
+                              handleTimeDragStart(time);
+                            }
+                          }}
+                          onMouseEnter={() => {
+                            if (timeDragStart && !dayBlocked && !booking) {
+                              handleTimeDragOver(time);
+                            }
+                          }}
+                          onMouseUp={() => {
+                            if (timeDragStart) {
+                              handleTimeDragEnd();
+                            }
+                          }}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium text-sm">{time}</span>
+                            {dayBlocked && <span className="text-xs text-gray-400">Dia bloqueado</span>}
+                            {blocked && !dayBlocked && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteBlock(blockedSlots.find(b =>
+                                    selectedDate >= b.start_date && selectedDate <= b.end_date &&
+                                    b.start_time && b.end_time &&
+                                    time >= b.start_time && time <= b.end_time
+                                  )?.id || '');
+                                }}
+                                className="text-xs text-red-500 hover:text-red-700"
+                              >
+                                ✕ Desbloquear
+                              </button>
+                            )}
+                            {booking && !dayBlocked && !blocked && (
+                              <span className="text-xs">
+                                {booking.customer_name.split(' ')[0]}
+                              </span>
+                            )}
+                            {isSelected && !booking && !blocked && (
+                              <span className="text-xs text-orange-600 font-medium">Selecionado</span>
+                            )}
+                          </div>
+                          {booking && !dayBlocked && !blocked && (
+                            <div className="text-xs opacity-75 mt-1">
+                              {booking.service_name} • {formatPrice(booking.price_cents || 149990)}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Quick tips */}
+                <div className="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500 space-y-1">
+                  <p>💡 <strong>Clique</strong> em horário vazio para selecionar</p>
+                  <p>💡 <strong>Arraste</strong> para selecionar múltiplos horários</p>
+                  <p>💡 <strong>Clique</strong> em bloqueio para remover</p>
+                  <p>💡 <strong>Duplo clique</strong> no dia para bloquear/desbloquear</p>
+                </div>
+
+                {/* Blocked slots for this date */}
+                {selectedDateBlocks.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Bloqueios neste dia</h4>
+                    {selectedDateBlocks.map(block => (
+                      <div key={block.id} className="flex items-center justify-between py-1 px-2 bg-red-50 rounded-lg mb-1">
+                        <span className="text-sm text-red-700">
+                          {block.start_time || 'Dia inteiro'}
+                          {block.end_time && block.start_time && ` - ${block.end_time}`}
+                          {block.reason && ` (${block.reason})`}
+                        </span>
+                        <button
+                          onClick={() => handleDeleteBlock(block.id)}
+                          className="text-red-500 hover:text-red-700 ml-2"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
 
-              {/* Selected Time Slots Actions */}
-              {selectedTimes.size > 0 && (
-                <div className="mb-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-orange-800">
-                      {selectedTimes.size} horário{selectedTimes.size > 1 ? 's' : ''} selecionado{selectedTimes.size > 1 ? 's' : ''}
-                    </span>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        placeholder="Motivo (opcional)"
-                        className="text-sm px-2 py-1 border border-orange-200 rounded-lg w-32"
-                        id="blockReason"
-                      />
-                      <button
-                        onClick={() => {
-                          const reason = (document.getElementById('blockReason') as HTMLInputElement)?.value || 'Indisponível';
-                          confirmBulkTimeBlock(reason);
-                        }}
-                        disabled={saving}
-                        className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 disabled:opacity-50"
-                      >
-                        {saving ? 'Salvando...' : 'Bloquear'}
-                      </button>
-                      <button
-                        onClick={cancelTimeSelection}
-                        className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200"
-                      >
-                        Cancelar
-                      </button>
-                    </div>
+              {/* Blocked Dates List */}
+              {blockedSlots.length > 0 && (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                  <h4 className="font-medium text-gray-900 mb-3">📅 Todos os Bloqueios</h4>
+                  <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                    {blockedSlots.slice(0, 10).map(block => (
+                      <div key={block.id} className="flex items-center justify-between py-2 px-3 bg-red-50 rounded-lg">
+                        <div>
+                          <div className="text-sm font-medium text-red-700">
+                            {new Date(block.start_date).toLocaleDateString('pt-BR')}
+                            {block.end_date !== block.start_date && (
+                              <> - {new Date(block.end_date).toLocaleDateString('pt-BR')}</>
+                            )}
+                          </div>
+                          {block.start_time && (
+                            <div className="text-xs text-red-600">{block.start_time} - {block.end_time}</div>
+                          )}
+                          {block.reason && (
+                            <div className="text-xs text-red-600">{block.reason}</div>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => handleDeleteBlock(block.id)}
+                          className="text-red-400 hover:text-red-600"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                    {blockedSlots.length > 10 && (
+                      <div className="text-center text-sm text-gray-500 pt-2">
+                        +{blockedSlots.length - 10} mais bloqueios
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
-
-              {/* Time Slots */}
-              {selectedDate && (
-                <div className="space-y-1 max-h-[400px] overflow-y-auto">
-                  {TIME_SLOTS.map(time => {
-                    const booking = selectedDateBookings.find(b => b.booking_time === time);
-                    const blocked = isTimeSlotBlocked(selectedDate, time);
-                    const isSelected = selectedTimes.has(time);
-                    const dayBlocked = isDateBlocked(selectedDate);
-
-                    return (
-                      <div
-                        key={time}
-                        className={`p-2 rounded-lg border transition-all cursor-pointer ${
-                          dayBlocked
-                            ? 'bg-gray-100 border-gray-200 opacity-50'
-                            : isSelected
-                            ? 'bg-orange-100 border-orange-300 ring-2 ring-orange-400'
-                            : blocked
-                            ? 'bg-red-50 border-red-200 hover:bg-red-100'
-                            : booking
-                            ? `${STATUS_COLORS[booking.status]} hover:opacity-80`
-                            : 'bg-gray-50 border-gray-100 hover:bg-gray-100 hover:border-gray-200'
-                        }`}
-                        onClick={() => {
-                          if (dayBlocked) return;
-                          if (booking) {
-                            setSelectedBooking(booking);
-                            setShowBookingModal(true);
-                          } else {
-                            toggleTimeSlot(selectedDate, time);
-                          }
-                        }}
-                        onMouseDown={() => {
-                          if (!dayBlocked && !booking) {
-                            handleTimeDragStart(time);
-                          }
-                        }}
-                        onMouseEnter={() => {
-                          if (timeDragStart && !dayBlocked && !booking) {
-                            handleTimeDragOver(time);
-                          }
-                        }}
-                        onMouseUp={() => {
-                          if (timeDragStart) {
-                            handleTimeDragEnd();
-                          }
-                        }}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium text-sm">{time}</span>
-                          {dayBlocked && <span className="text-xs text-gray-400">Dia bloqueado</span>}
-                          {blocked && !dayBlocked && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteBlock(blockedSlots.find(b =>
-                                  selectedDate >= b.start_date && selectedDate <= b.end_date &&
-                                  b.start_time && b.end_time &&
-                                  time >= b.start_time && time <= b.end_time
-                                )?.id || '');
-                              }}
-                              className="text-xs text-red-500 hover:text-red-700"
-                            >
-                              ✕ Desbloquear
-                            </button>
-                          )}
-                          {booking && !dayBlocked && !blocked && (
-                            <span className="text-xs">
-                              {booking.customer_name.split(' ')[0]}
-                            </span>
-                          )}
-                          {isSelected && !booking && !blocked && (
-                            <span className="text-xs text-orange-600 font-medium">Selecionado</span>
-                          )}
-                        </div>
-                        {booking && !dayBlocked && !blocked && (
-                          <div className="text-xs opacity-75 mt-1">
-                            {booking.service_name} • {formatPrice(booking.price_cents || 149990)}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Quick tips */}
-              <div className="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500 space-y-1">
-                <p>💡 <strong>Clique</strong> em um horário vazio para selecionar</p>
-                <p>💡 <strong>Arraste</strong> para selecionar múltiplos horários</p>
-                <p>💡 <strong>Clique</strong> em um bloqueio para remover</p>
-                <p>💡 <strong>Duplo clique</strong> no dia para bloquear/desbloquear tudo</p>
+            </div>
+          </div>
+        ) : (
+          /* List View - Upcoming Appointments */
+          <div className="space-y-6">
+            {/* Filter Tabs */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm text-gray-500 mr-2">Filtrar:</span>
+                <button
+                  onClick={() => setStatusFilter('all')}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                    statusFilter === 'all' 
+                      ? 'bg-gray-800 text-white' 
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  Todos ({bookings.length})
+                </button>
+                <button
+                  onClick={() => setStatusFilter('pending')}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                    statusFilter === 'pending' 
+                      ? 'bg-amber-500 text-white' 
+                      : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
+                  }`}
+                >
+                  ⏳ Pendentes ({bookings.filter(b => b.status === 'pending').length})
+                </button>
+                <button
+                  onClick={() => setStatusFilter('confirmed')}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                    statusFilter === 'confirmed' 
+                      ? 'bg-blue-500 text-white' 
+                      : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                  }`}
+                >
+                  ✓ Confirmados ({bookings.filter(b => b.status === 'confirmed').length})
+                </button>
+                <button
+                  onClick={() => setStatusFilter('form_sent')}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                    statusFilter === 'form_sent' 
+                      ? 'bg-purple-500 text-white' 
+                      : 'bg-purple-50 text-purple-700 hover:bg-purple-100'
+                  }`}
+                >
+                  📝 Form Enviado ({bookings.filter(b => b.status === 'form_sent').length})
+                </button>
+                <button
+                  onClick={() => setStatusFilter('completed')}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                    statusFilter === 'completed' 
+                      ? 'bg-green-500 text-white' 
+                      : 'bg-green-50 text-green-700 hover:bg-green-100'
+                  }`}
+                >
+                  ✅ Concluídos ({bookings.filter(b => b.status === 'completed').length})
+                </button>
               </div>
-
-              {/* Blocked slots for this date */}
-              {selectedDateBlocks.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Bloqueios neste dia</h4>
-                  {selectedDateBlocks.map(block => (
-                    <div key={block.id} className="flex items-center justify-between py-1 px-2 bg-red-50 rounded-lg mb-1">
-                      <span className="text-sm text-red-700">
-                        {block.start_time || 'Dia inteiro'}
-                        {block.end_time && block.start_time && ` - ${block.end_time}`}
-                        {block.reason && ` (${block.reason})`}
-                      </span>
-                      <button
-                        onClick={() => handleDeleteBlock(block.id)}
-                        className="text-red-500 hover:text-red-700 ml-2"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
 
-            {/* Blocked Dates List */}
+            {/* Appointments List */}
+            {loading ? (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
+                <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-gray-500">Carregando agendamentos...</p>
+              </div>
+            ) : Object.keys(bookingsByDate).length === 0 ? (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
+                <div className="text-4xl mb-4">📅</div>
+                <p className="text-gray-500">Nenhum agendamento encontrado</p>
+                <p className="text-sm text-gray-400 mt-2">
+                  {statusFilter !== 'all' ? 'Tente outro filtro' : 'Novos agendamentos aparecerão aqui'}
+                </p>
+              </div>
+            ) : (
+              Object.entries(bookingsByDate).map(([date, dateBookings]) => (
+                <div key={date} className="space-y-2">
+                  {/* Date Header */}
+                  <div className="flex items-center gap-3 px-2">
+                    <div className="text-sm font-semibold text-gray-700">
+                      {formatDate(date)}
+                    </div>
+                    <div className="flex-1 h-px bg-gray-200"></div>
+                    <div className="text-sm text-gray-500">
+                      {dateBookings.length} agendamento{dateBookings.length > 1 ? 's' : ''}
+                    </div>
+                  </div>
+
+                  {/* Appointments for this date */}
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    {dateBookings.map((booking, idx) => (
+                      <div
+                        key={booking.id}
+                        className={`flex items-center gap-4 p-4 cursor-pointer hover:bg-gray-50 transition-all ${
+                          idx < dateBookings.length - 1 ? 'border-b border-gray-100' : ''
+                        }`}
+                        onClick={() => {
+                          setSelectedBooking(booking);
+                          setShowBookingModal(true);
+                        }}
+                      >
+                        {/* Time */}
+                        <div className="w-16 text-center">
+                          <div className="text-lg font-bold text-gray-900">{booking.booking_time}</div>
+                        </div>
+
+                        {/* Temperature/Status Indicator */}
+                        <div className={`w-3 h-3 rounded-full ${
+                          booking.lead_temperature === 'hot' ? 'bg-red-500' :
+                          booking.lead_temperature === 'warm' ? 'bg-amber-500' :
+                          'bg-blue-500'
+                        }`}></div>
+
+                        {/* Client Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-gray-900 truncate">{booking.customer_name}</span>
+                            <span className={`px-2 py-0.5 rounded-full text-xs ${STATUS_COLORS[booking.status]}`}>
+                              {STATUS_LABELS[booking.status]}
+                            </span>
+                          </div>
+                          <div className="text-sm text-gray-500 truncate">
+                            {booking.service_name} • {booking.customer_email}
+                          </div>
+                        </div>
+
+                        {/* Price */}
+                        <div className="text-right">
+                          <div className="font-semibold text-green-600">{formatPrice(booking.price_cents || 149990)}</div>
+                          <div className="text-xs text-gray-400">{booking.booking_code?.slice(-6)}</div>
+                        </div>
+
+                        {/* Arrow */}
+                        <div className="text-gray-400">→</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))
+            )}
+
+            {/* All Blocked Slots Summary */}
             {blockedSlots.length > 0 && (
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-                <h4 className="font-medium text-gray-900 mb-3">📅 Todos os Bloqueios</h4>
-                <div className="space-y-2 max-h-[200px] overflow-y-auto">
-                  {blockedSlots.slice(0, 10).map(block => (
-                    <div key={block.id} className="flex items-center justify-between py-2 px-3 bg-red-50 rounded-lg">
+                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <span>🚫</span> Datas Bloqueadas ({blockedSlots.length})
+                </h3>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {blockedSlots.slice(0, 6).map(block => (
+                    <div key={block.id} className="flex items-center justify-between p-2 bg-red-50 rounded-lg">
                       <div>
                         <div className="text-sm font-medium text-red-700">
                           {new Date(block.start_date).toLocaleDateString('pt-BR')}
@@ -854,9 +1145,6 @@ export default function SchedulePage() {
                             <> - {new Date(block.end_date).toLocaleDateString('pt-BR')}</>
                           )}
                         </div>
-                        {block.start_time && (
-                          <div className="text-xs text-red-600">{block.start_time} - {block.end_time}</div>
-                        )}
                         {block.reason && (
                           <div className="text-xs text-red-600">{block.reason}</div>
                         )}
@@ -869,16 +1157,16 @@ export default function SchedulePage() {
                       </button>
                     </div>
                   ))}
-                  {blockedSlots.length > 10 && (
-                    <div className="text-center text-sm text-gray-500 pt-2">
-                      +{blockedSlots.length - 10} mais bloqueios
-                    </div>
-                  )}
                 </div>
+                {blockedSlots.length > 6 && (
+                  <p className="text-sm text-gray-500 mt-2">
+                    +{blockedSlots.length - 6} bloqueios adicionais
+                  </p>
+                )}
               </div>
             )}
           </div>
-        </div>
+        )}
       </div>
 
       {/* Block Modal */}
@@ -995,15 +1283,33 @@ export default function SchedulePage() {
                 <span className="font-medium">{selectedBooking.service_name}</span>
               </div>
               <div className="flex justify-between py-1 border-b">
+                <span className="text-gray-500">Email</span>
+                <span className="font-medium text-sm">{selectedBooking.customer_email}</span>
+              </div>
+              <div className="flex justify-between py-1 border-b">
                 <span className="text-gray-500">Valor</span>
                 <span className="font-medium text-green-600">{formatPrice(selectedBooking.price_cents || 149990)}</span>
               </div>
               <div className="flex justify-between py-1 border-b">
                 <span className="text-gray-500">Status</span>
                 <span className={`px-2 py-0.5 rounded-full text-xs ${STATUS_COLORS[selectedBooking.status]}`}>
-                  {selectedBooking.status}
+                  {STATUS_LABELS[selectedBooking.status]}
                 </span>
               </div>
+              {selectedBooking.lead_temperature && (
+                <div className="flex justify-between py-1 border-b">
+                  <span className="text-gray-500">Temperatura</span>
+                  <span className={`px-2 py-0.5 rounded-full text-xs ${
+                    selectedBooking.lead_temperature === 'hot' ? 'bg-red-100 text-red-700' :
+                    selectedBooking.lead_temperature === 'warm' ? 'bg-amber-100 text-amber-700' :
+                    'bg-blue-100 text-blue-700'
+                  }`}>
+                    {selectedBooking.lead_temperature === 'hot' ? '🔥 Quente' :
+                     selectedBooking.lead_temperature === 'warm' ? '🌡️ Morno' :
+                     '❄️ Frio'}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Status Change */}
@@ -1014,17 +1320,13 @@ export default function SchedulePage() {
                   <button
                     key={status}
                     onClick={() => handleUpdateStatus(selectedBooking.id, status)}
-                    className={`px-3 py-1 rounded-lg text-xs font-medium ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
                       selectedBooking.status === status
                         ? 'ring-2 ring-blue-500 '
                         : ''
                     }${STATUS_COLORS[status]}`}
                   >
-                    {status === 'pending' ? '⏳ Pendente' :
-                     status === 'confirmed' ? '✓ Confirmado' :
-                     status === 'form_sent' ? '📝 Form Enviado' :
-                     status === 'completed' ? '✅ Concluído' :
-                     '❌ Cancelado'}
+                    {STATUS_LABELS[status]}
                   </button>
                 ))}
               </div>
@@ -1032,7 +1334,7 @@ export default function SchedulePage() {
 
             {/* WhatsApp Link */}
             <a
-              href={`https://wa.me/${selectedBooking.customer_phone?.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá ${selectedBooking.customer_name?.split(' ')[0]}!`)}`}
+              href={`https://wa.me/${selectedBooking.customer_phone?.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá ${selectedBooking.customer_name?.split(' ')[0]}!`)}&text=${encodeURIComponent(`Olá ${selectedBooking.customer_name?.split(' ')[0]}!`)}`}
               target="_blank"
               className="block w-full text-center px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600"
             >
