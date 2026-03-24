@@ -88,6 +88,7 @@ export default function SchedulePage() {
   // View state
   const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [listDateRange, setListDateRange] = useState<{ start: number; days: number }>({ start: 0, days: 14 });
   
   // Modal states
   const [showBlockModal, setShowBlockModal] = useState(false);
@@ -209,14 +210,19 @@ export default function SchedulePage() {
     return `€${(cents / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
   }
 
-  // Get upcoming bookings (next 7 days)
+  // Get upcoming bookings (configurable range)
   function getUpcomingBookings() {
     const today = dateStr(new Date());
-    const nextWeek = dateStr(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
+    const rangeStart = new Date(Date.now() + listDateRange.start * 24 * 60 * 60 * 1000);
+    const rangeEnd = new Date(Date.now() + (listDateRange.start + listDateRange.days) * 24 * 60 * 60 * 1000);
+    const rangeEndStr = dateStr(rangeEnd);
     
     return bookings
-      .filter(b => b.booking_date >= today && b.booking_date <= nextWeek)
-      .filter(b => statusFilter === 'all' || b.status === statusFilter)
+      .filter(b => {
+        const isInRange = b.booking_date >= today && b.booking_date <= rangeEndStr;
+        const matchesFilter = statusFilter === 'all' || b.status === statusFilter;
+        return isInRange && matchesFilter;
+      })
       .sort((a, b) => {
         if (a.booking_date !== b.booking_date) return a.booking_date.localeCompare(b.booking_date);
         return (a.booking_time || '').localeCompare(b.booking_time || '');
@@ -1016,6 +1022,64 @@ export default function SchedulePage() {
                   <p className="text-xs">(horário de verão)</p>
                 </div>
               </div>
+            </div>
+
+            {/* Date Range Navigation */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-gray-900">📅 Período</h3>
+                <div className="flex items-center gap-2">
+                  <select
+                    value={listDateRange.days}
+                    onChange={(e) => setListDateRange(prev => ({ ...prev, days: parseInt(e.target.value) }))}
+                    className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm"
+                  >
+                    <option value={7}>Próximos 7 dias</option>
+                    <option value={14}>Próximos 14 dias</option>
+                    <option value={30}>Próximos 30 dias</option>
+                    <option value={60}>Próximos 60 dias</option>
+                    <option value={90}>Próximos 90 dias</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={() => setListDateRange(prev => ({ ...prev, start: Math.max(0, prev.start - prev.days) }))}
+                  disabled={listDateRange.start === 0}
+                  className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  ← Anterior
+                </button>
+                <div className="text-center">
+                  <div className="font-medium text-gray-900">
+                    {listDateRange.start === 0 
+                      ? 'Hoje' 
+                      : new Date(Date.now() + listDateRange.start * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })
+                    }
+                    {' → '}
+                    {new Date(Date.now() + (listDateRange.start + listDateRange.days) * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {listDateRange.days} dias
+                  </div>
+                </div>
+                <button
+                  onClick={() => setListDateRange(prev => ({ ...prev, start: prev.start + prev.days }))}
+                  className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
+                >
+                  Próximo →
+                </button>
+              </div>
+              {listDateRange.start > 0 && (
+                <div className="mt-2 text-center">
+                  <button
+                    onClick={() => setListDateRange({ start: 0, days: 14 })}
+                    className="text-sm text-blue-600 hover:underline"
+                  >
+                    Voltar para hoje
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Filter Tabs */}
