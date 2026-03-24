@@ -539,7 +539,7 @@ export default function SchedulePage() {
               </div>
               <div>
                 <h1 className="font-bold text-gray-900">NomadWay</h1>
-                <p className="text-xs text-gray-500">Agenda Interativa</p>
+                <p className="text-xs text-gray-500">Agenda Interativa • Horários España 🇪🇸</p>
               </div>
             </div>
 
@@ -832,6 +832,16 @@ export default function SchedulePage() {
                   </div>
                 )}
 
+                {/* Timezone Indicator */}
+                {selectedDate && (
+                  <div className="flex items-center gap-2 text-xs text-gray-500 mb-2 pb-2 border-b border-gray-100">
+                    <span>🕐</span>
+                    <span>Horários em <strong>Espanha (GMT+1)</strong></span>
+                    <span className="text-gray-300">|</span>
+                    <span>🇧🇷 Brasil: -4h a -5h dependendo do horário de verão</span>
+                  </div>
+                )}
+
                 {/* Time Slots */}
                 {selectedDate && (
                   <div className="space-y-1 max-h-[400px] overflow-y-auto">
@@ -991,6 +1001,23 @@ export default function SchedulePage() {
         ) : (
           /* List View - Upcoming Appointments */
           <div className="space-y-6">
+            {/* Timezone Banner */}
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 border border-blue-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🕐</span>
+                  <div>
+                    <p className="font-medium text-gray-900">Horários da Espanha 🇪🇸</p>
+                    <p className="text-sm text-gray-600">Todos os horários estão em <strong>GMT+1 (Madrid)</strong></p>
+                  </div>
+                </div>
+                <div className="text-right text-sm text-gray-500">
+                  <p>🇧🇷 <strong>Brasil:</strong> -4h a -5h</p>
+                  <p className="text-xs">(horário de verão)</p>
+                </div>
+              </div>
+            </div>
+
             {/* Filter Tabs */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
               <div className="flex items-center gap-2 flex-wrap">
