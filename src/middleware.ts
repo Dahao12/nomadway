@@ -34,6 +34,7 @@ const publicRoutes = [
   '/api/portal-v2',   // Client portal v2
   '/api/validate-code', // Public client code validation
   '/api/forms-v2',    // Public form submission
+  '/api/forms/',      // Public form by code (GET /api/forms/[code])
   '/api/ficha',       // Public client form
   '/api/webhooks',    // Webhooks need to be public for external services
   '/api/whatsapp',    // WhatsApp webhook endpoint
