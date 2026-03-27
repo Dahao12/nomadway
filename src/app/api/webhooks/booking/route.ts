@@ -272,6 +272,23 @@ export async function POST(request: NextRequest) {
     const partner_code = body.partner_code || null;
     const referral_source = body.referral_source || null;
 
+    // Structured form data (from booking form)
+    const visa_type = body.visa_type || null;
+    const family_count = body.family_count || null;
+    const knows_visas = body.knows_visas || null;
+    const travel_timeline = body.travel_timeline || null;
+    const budget = body.budget || null;
+    const profession = body.profession || null;
+    const intended_city = body.intended_city || null;
+    const has_traveled_abroad = body.has_traveled_abroad || null;
+    const how_found_us = body.how_found_us || null;
+    const main_challenge = body.main_challenge || null;
+    const already_in_spain = body.already_in_spain || null;
+    const other_questions = body.other_questions || null;
+    const instagram = body.instagram || null;
+    const family_relationship = body.family_relationship || null;
+    const family_member_name = body.family_member_name || null;
+
     // Validate required fields
     if (!customer_name || !customer_email || !customer_phone || !booking_date || !booking_time) {
       return NextResponse.json(
@@ -374,6 +391,22 @@ export async function POST(request: NextRequest) {
         language,
         partner_code,
         referral_source,
+        // Structured form data
+        visa_type,
+        family_count,
+        knows_visas,
+        travel_timeline,
+        budget,
+        profession,
+        intended_city,
+        has_traveled_abroad,
+        how_found_us,
+        main_challenge,
+        already_in_spain,
+        other_questions,
+        instagram,
+        family_relationship,
+        family_member_name,
         created_at: new Date().toISOString()
       })
       .select()
