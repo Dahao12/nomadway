@@ -14,12 +14,15 @@ interface FormData {
   passaporte_validade: string;
   whatsapp: string;
   email: string;
+  instagram: string;
   pais_residencia: string;
   profissao: string;
   empresa: string;
   renda_mensal: string;
   vinculo_estrangeiro: boolean;
   freelancer_pj: boolean;
+  grau_parentesco: string;
+  nome_parente: string;
   servico: string;
   valor: string;
   forma_pagamento: string;
@@ -37,12 +40,15 @@ const initialFormData: FormData = {
   passaporte_validade: '',
   whatsapp: '',
   email: '',
+  instagram: '',
   pais_residencia: 'Brasil',
   profissao: '',
   empresa: '',
   renda_mensal: '',
   vinculo_estrangeiro: false,
   freelancer_pj: false,
+  grau_parentesco: '',
+  nome_parente: '',
   servico: 'digital_nomad',
   valor: '',
   forma_pagamento: 'pix',
@@ -319,6 +325,17 @@ export default function FormPage() {
                 />
               </div>
               <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Instagram (opcional)</label>
+                <input
+                  type="text"
+                  name="instagram"
+                  value={formData.instagram}
+                  onChange={handleChange}
+                  placeholder="@seuusuario"
+                  className="w-full border border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">País de Residência Atual</label>
                 <input
                   type="text"
@@ -337,8 +354,6 @@ export default function FormPage() {
               <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">4</div>
               <h2 className="text-lg font-bold text-gray-900">Dados Profissionais</h2>
             </div>
-
-            <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Profissão / Cargo</label>
@@ -396,10 +411,50 @@ export default function FormPage() {
             </div>
           </div>
 
-          {/* 5. SERVIÇO E PAGAMENTO */}
+          {/* 5. FAMÍLIA / DEPENDENTES */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">5</div>
+              <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">5</div>
+              <h2 className="text-lg font-bold text-gray-900">Família / Dependentes</h2>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Possui parentes que pretendem ir junto?</label>
+                <select
+                  name="grau_parentesco"
+                  value={formData.grau_parentesco}
+                  onChange={handleChange}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Não, vou sozinho(a)</option>
+                  <option value="conjuge">Cônjuge / Esposo(a)</option>
+                  <option value="filho">Filho(a)</option>
+                  <option value="pai_mae">Pai / Mãe</option>
+                  <option value="irmao">Irmão(ã)</option>
+                  <option value="outro">Outro parente</option>
+                </select>
+              </div>
+              {formData.grau_parentesco && formData.grau_parentesco !== '' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nome completo do parente</label>
+                  <input
+                    type="text"
+                    name="nome_parente"
+                    value={formData.nome_parente}
+                    onChange={handleChange}
+                    placeholder="Nome completo"
+                    className="w-full border border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 6. SERVIÇO E PAGAMENTO */}
+          <div className="bg-white rounded-2xl shadow-sm p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">6</div>
               <h2 className="text-lg font-bold text-gray-900">Serviço e Pagamento</h2>
             </div>
 
@@ -442,10 +497,10 @@ export default function FormPage() {
             </div>
           </div>
 
-          {/* OBSERVAÇÕES */}
+          {/* 7. OBSERVAÇÕES */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-gray-500 to-gray-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">📝</div>
+              <div className="w-8 h-8 bg-gradient-to-br from-gray-500 to-gray-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">7</div>
               <h2 className="text-lg font-bold text-gray-900">Observações</h2>
             </div>
 
